@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    // es module 和 commonjs 能否混合使用 这两个选项一般一起
+    "target": "ES6",
+    "esModuleInterop": true,
+    "importHelpers": true,// 辅助的导入功能
+    //生成声明文件
+    // "declaration":true, 
+    "lib": ["esnext", "dom",],
+    "moduleResolution":"Node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports":true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "#/*": ["./types/*"]
+    }
+  },
+  "include": [
+    "src/**/*", 
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "types/**/*.d.ts", "types/index.d.ts",
+  ],
+  "exclude": ["node_modules", "tests", "dist", "**/*.js"]
+}
