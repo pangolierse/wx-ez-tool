@@ -46,7 +46,8 @@ export const dispatcher = _dispatcher.assign({
     state.channel[key] = null;
     return v;
   },
+
   createStore(store) {
-    this.store = new Store(store);
+    state.store = new Store(store);
   },
 });

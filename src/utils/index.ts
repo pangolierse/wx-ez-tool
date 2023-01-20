@@ -1,3 +1,5 @@
+import { isPromise } from "./is";
+
 export function find(list, f) {
   return list.filter(f)[0];
 }
@@ -33,4 +35,17 @@ export function partial(fn, arg) {
   return function () {
     return fn(arg);
   };
+}
+
+export function toPromise(fn) {
+  if (isPromise(fn)) {
+    return fn;
+  } else {
+    return function () {
+      let args = arguments;
+      return new Promise((resolve) => {
+        resolve(fn.apply(null, args));
+      });
+    };
+  }
 }

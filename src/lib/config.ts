@@ -23,7 +23,7 @@ const config = {
             return new RegExp("^" + item.replace(/^\/?/, "/?").replace(/[\.]/g, "\\.").replace("$page", "([\\w\\-]+)"));
           });
           _config.routeResolve = function (name) {
-            return mainRoute.replace("$page", name);
+            return mainRoute.replace(/\$page/g, name);
           };
           _config.nameResolve = function (url) {
             var n = "";

@@ -1,0 +1,4 @@
+<!--components/list/index.wxml-->
+<text>components/list/index.wxml</text>
+<text>我是组件里的mapGetter{{name}}</text>
+<button bindtap="gotoLog">log</button>

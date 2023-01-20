@@ -1,4 +1,9 @@
-App({
+import "./lib/ptool.esm";
+import store from "./store/index";
+// import { PTool } from "./typings/ptool";
+// PTool.App({
+PTool.createStore(store);
+PTool.App({
   config: {
     route: "/pages/$page/$page",
   },

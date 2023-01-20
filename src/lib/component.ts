@@ -47,6 +47,7 @@ function IComponent(option) {
     this.triggerEvent("mount", this.$id);
   });
   option.lifetimes.ready = fns.wrapFun(option.lifetimes.ready, function () {
+    this.$state = this.$state || {};
     this.$state.lifeState = ComponentState.ready;
   });
   option.lifetimes.detached = fns.wrapFun(option.lifetimes.detached, function () {

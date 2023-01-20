@@ -38,10 +38,16 @@ export default [
   },
   {
     input: "./types/index.d.ts",
-    output: {
-      file: "./lib/types/index.d.ts",
-      format: "esm",
-    },
+    output: [
+      {
+        file: "./lib/types/ptool.d.ts",
+        format: "esm",
+      },
+      {
+        file: "./test/typings/ptool.d.ts",
+        format: "esm",
+      },
+    ],
     plugins: [dts()],
   },
 ];

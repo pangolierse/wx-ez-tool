@@ -1,4 +1,4 @@
-/// <reference path="../node_modules/miniprogram-api-typings/index.d.ts" />
+/// <reference path="../../node_modules/miniprogram-api-typings/index.d.ts" />
 declare global {
   namespace PToolSpace {
     // 页面接受参数
@@ -378,4 +378,5 @@ declare global {
   type PToolStoreModule<T> = PToolSpace.StoreModule<T>;
 }
 declare let PToolExport: string;
+
 export { PToolExport };

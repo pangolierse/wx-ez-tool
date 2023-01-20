@@ -3,10 +3,6 @@ import IApp from "./lib/app";
 import redirector from "./lib/redirector";
 import IComponent from "./lib/component";
 import { stateProxy, dispatcher } from "./lib/state";
-// 事件总线语法糖
-// eventBus.assign(PTool);
-// 分发跳转事件
-// bridge.redirectDelegate(PTool.redirector, PTool._dispatcher);
 const PTool = {
   Page: IPage,
   Component: IComponent,
@@ -14,6 +10,12 @@ const PTool = {
   store: stateProxy.store,
   createStore: dispatcher.createStore,
 };
+stateProxy.eventBus.assign(PTool);
 redirector.redirectDelegate(PTool);
-
+// 自动注入PTool到全局
+Object.defineProperty(Object.prototype, "PTool", {
+  value: PTool,
+  configurable: false,
+  enumerable: false,
+});
 export default PTool;

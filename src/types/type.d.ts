@@ -23,7 +23,7 @@ interface ToolState {
   hideTime: number;
   eventBus: Emit;
   channel: Map<string, any>;
-  store: typeof Store;
+  store: Store;
 }
 type navigate = (c: NavigateToOption) => void;
 interface NavigateMethod<T extends object = any> {
