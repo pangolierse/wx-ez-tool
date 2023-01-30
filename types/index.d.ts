@@ -374,7 +374,8 @@ declare global {
     Page: PToolSpace.Page.WXConstructor;
     store?: PToolSpace.Store;
     createStore: (store: PToolSpace.StoreRootModule) => void;
-  } & PToolSpace.Emit;
+  } & PToolSpace.Emit &
+    PToolSpace.NavigateMethod;
   type PToolStoreModule<T> = PToolSpace.StoreModule<T>;
 }
 declare let PToolExport: string;
