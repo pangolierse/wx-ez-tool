@@ -1,5 +1,5 @@
 import * as is from "../utils/is";
-import fns from "../utils/fns";
+import { objEach } from "../utils/fns";
 const _config = {
   routeFrozenTime: 2000,
   nameResolve: null,
@@ -20,7 +20,13 @@ const config = {
           let routes = t == "String" ? [v] : v;
           let mainRoute = routes[0];
           routes = routes.map(function (item) {
-            return new RegExp("^" + item.replace(/^\/?/, "/?").replace(/[\.]/g, "\\.").replace("$page", "([\\w\\-]+)"));
+            return new RegExp(
+              "^" +
+                item
+                  .replace(/^\/?/, "/?")
+                  .replace(/[\.]/g, "\\.")
+                  .replace(/\$page/g, "([\\w\\-]+)"),
+            );
           });
           _config.routeResolve = function (name) {
             return mainRoute.replace(/\$page/g, name);
@@ -50,7 +56,7 @@ const config = {
 
   setConfig: function (key: string | object, value?: any) {
     if (is.isObject(key)) {
-      fns.objEach(key, (k, v) => {
+      objEach(key, (k, v) => {
         this.set(k, v);
       });
     } else {

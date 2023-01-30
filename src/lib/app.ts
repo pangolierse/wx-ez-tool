@@ -1,4 +1,4 @@
-import fns from "../utils/fns";
+import { wrapFun } from "../utils/fns";
 import config from "./config";
 import { assert } from "../utils/is";
 import { stateProxy, dispatcher } from "./state";
@@ -12,9 +12,9 @@ function IApp(option) {
   /**
    * APP sleep logical
    */
-  option.onShow = option.onShow ? fns.wrapFun(option.onShow, appShowHandler) : appShowHandler;
-  option.onHide = option.onHide ? fns.wrapFun(option.onHide, appHideHandler) : appHideHandler;
-  option.onLaunch = fns.wrapFun(option.onLaunch, function () {
+  option.onShow = option.onShow ? wrapFun(option.onShow, appShowHandler) : appShowHandler;
+  option.onHide = option.onHide ? wrapFun(option.onHide, appHideHandler) : appHideHandler;
+  option.onLaunch = wrapFun(option.onLaunch, function () {
     ctx = this;
   });
   if (option.onAwake) {

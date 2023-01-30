@@ -1,5 +1,5 @@
 import { getter, StoreModule, StoreRootModule } from "@/types/type";
-import fns from "@/utils/fns";
+import { wrapFun } from "@/utils/fns";
 import { forEachValue } from "@/utils/index";
 import { isFunction, isPromise, isObject, assert } from "@/utils/is";
 import { reactive, effect } from "../reactive";
@@ -230,7 +230,7 @@ function unifyObjectStyle(
 }
 export function usePageStore(option, store) {
   option.$store = store;
-  option.onLoad = fns.wrapFun(option.onLoad, function () {
+  option.onLoad = wrapFun(option.onLoad, function () {
     // 挂载全局store
     if (store) {
       if (option.mapGetters) {
@@ -240,7 +240,7 @@ export function usePageStore(option, store) {
   });
 }
 export function useComponentStore(option, store) {
-  option.lifetimes.attached = fns.wrapFun(option.lifetimes.attached, function () {
+  option.lifetimes.attached = wrapFun(option.lifetimes.attached, function () {
     // 挂载全局store
     if (store) {
       this.$store = store;

@@ -1,13 +1,16 @@
-'use strict';
+module.exports = (function() {
+var __MODS__ = {};
+var __DEFINE__ = function(modId, func, req) { var m = { exports: {}, _tempexports: {} }; __MODS__[modId] = { status: 0, func: func, req: req, m: m }; };
+var __REQUIRE__ = function(modId, source) { if(!__MODS__[modId]) return require(source); if(!__MODS__[modId].status) { var m = __MODS__[modId].m; m._exports = m._tempexports; var desp = Object.getOwnPropertyDescriptor(m, "exports"); if (desp && desp.configurable) Object.defineProperty(m, "exports", { set: function (val) { if(typeof val === "object" && val !== m._exports) { m._exports.__proto__ = val.__proto__; Object.keys(val).forEach(function (k) { m._exports[k] = val[k]; }); } m._tempexports = val }, get: function () { return m._tempexports; } }); __MODS__[modId].status = 1; __MODS__[modId].func(__MODS__[modId].req, m, m.exports); } return __MODS__[modId].m.exports; };
+var __REQUIRE_WILDCARD__ = function(obj) { if(obj && obj.__esModule) { return obj; } else { var newObj = {}; if(obj != null) { for(var k in obj) { if (Object.prototype.hasOwnProperty.call(obj, k)) newObj[k] = obj[k]; } } newObj.default = obj; return newObj; } };
+var __REQUIRE_DEFAULT__ = function(obj) { return obj && obj.__esModule ? obj.default : obj; };
+__DEFINE__(1675042454542, function(require, module, exports) {
+
 
 /* 参数是否为undefined */
 /* 参数是否为object */
 const isObject = (target) => {
     return Object.prototype.toString.call(target).search(/Object/) > -1;
-};
-/* 参数是否为object */
-const isString = (target) => {
-    return Object.prototype.toString.call(target).search(/String/) > -1;
 };
 /* 参数是否为array */
 const isArray = (target) => {
@@ -17,7 +20,7 @@ const isFunction = (target) => {
     return Object.prototype.toString.call(target).search(/Function/) > -1;
 };
 const toType = (target) => {
-    return Object.prototype.toString.call(target).split(" ")[1].replace("]", "");
+    return Object.prototype.toString.call(target).split(' ')[1].replace(']', '');
 };
 // 断言 不满足 提示错误
 const assert = (condition, msg) => {
@@ -27,70 +30,48 @@ const assert = (condition, msg) => {
 };
 // 是否是 Promise
 function isPromise(val) {
-    return val && typeof val.then === "function";
+    return val && typeof val.then === 'function';
 }
 
 function hasOwn(obj, prop) {
     return obj && obj.hasOwnProperty && obj.hasOwnProperty(prop);
 }
-function wrapFun(pre, wrapper) {
-    return function () {
-        try {
-            wrapper && wrapper.apply(this, arguments);
+var fns = {
+    wrapFun: function (pre, wrapper) {
+        return function () {
+            try {
+                wrapper && wrapper.apply(this, arguments);
+            }
+            finally {
+                pre && pre.apply(this, arguments);
+            }
+        };
+    },
+    extend: function (obj, ...args) {
+        if (toType(obj) != "Object" && toType(obj) != "Function")
+            return obj;
+        var source, prop;
+        for (var i = 0; i < args.length; i++) {
+            source = args[i];
+            for (prop in source) {
+                if (hasOwn(source, prop)) {
+                    obj[prop] = source[prop];
+                }
+            }
         }
-        finally {
-            pre && pre.apply(this, arguments);
-        }
-    };
-}
-function extend(obj, ...args) {
-    if (toType(obj) != "Object" && toType(obj) != "Function")
         return obj;
-    var source, prop;
-    for (var i = 0; i < args.length; i++) {
-        source = args[i];
-        for (prop in source) {
-            if (hasOwn(source, prop)) {
-                obj[prop] = source[prop];
+    },
+    objEach: function (obj, fn) {
+        if (!obj)
+            return;
+        for (var key in obj) {
+            if (hasOwn(obj, key)) {
+                if (fn(key, obj[key]) === false)
+                    break;
             }
         }
-    }
-    return obj;
-}
-function objEach(obj, fn) {
-    if (!obj)
-        return;
-    for (var key in obj) {
-        if (hasOwn(obj, key)) {
-            if (fn(key, obj[key]) === false)
-                break;
-        }
-    }
-}
-/**
- *
- * @param queue 执行队列
- * @param fn 迭代器（）
- * @param cb 执行结束回调
- */
-function runQueue(queue, fn, cb) {
-    const step = (index) => {
-        if (index >= queue.length) {
-            cb();
-        }
-        else {
-            if (queue[index]) {
-                fn(queue[index], () => {
-                    step(index + 1);
-                });
-            }
-            else {
-                step(index + 1);
-            }
-        }
-    };
-    step(0);
-}
+    },
+};
 
 var PageState;
 (function (PageState) {
@@ -106,13 +87,6 @@ var ComponentState;
     ComponentState[ComponentState["ready"] = 2] = "ready";
     ComponentState[ComponentState["detached"] = 3] = "detached";
 })(ComponentState || (ComponentState = {}));
-var NavigationFailureType;
-(function (NavigationFailureType) {
-    NavigationFailureType[NavigationFailureType["redirected"] = 2] = "redirected";
-    NavigationFailureType[NavigationFailureType["aborted"] = 4] = "aborted";
-    NavigationFailureType[NavigationFailureType["cancelled"] = 8] = "cancelled";
-    NavigationFailureType[NavigationFailureType["duplicated"] = 16] = "duplicated";
-})(NavigationFailureType || (NavigationFailureType = {}));
 
 class Emit {
     constructor(all) {
@@ -184,14 +158,6 @@ function toPromise(fn) {
             });
         };
     }
-}
-function registerHook(list, fn) {
-    list.push(fn);
-    return () => {
-        const i = list.indexOf(fn);
-        if (i > -1)
-            list.splice(i, 1);
-    };
 }
 
 let activeEffect = null;
@@ -619,7 +585,7 @@ options) {
 }
 function usePageStore(option, store) {
     option.$store = store;
-    option.onLoad = wrapFun(option.onLoad, function () {
+    option.onLoad = fns.wrapFun(option.onLoad, function () {
         // 挂载全局store
         if (store) {
             if (option.mapGetters) {
@@ -629,7 +595,7 @@ function usePageStore(option, store) {
     });
 }
 function useComponentStore(option, store) {
-    option.lifetimes.attached = wrapFun(option.lifetimes.attached, function () {
+    option.lifetimes.attached = fns.wrapFun(option.lifetimes.attached, function () {
         // 挂载全局store
         if (store) {
             this.$store = store;
@@ -708,11 +674,7 @@ const config = {
                     let routes = t == "String" ? [v] : v;
                     let mainRoute = routes[0];
                     routes = routes.map(function (item) {
-                        return new RegExp("^" +
-                            item
-                                .replace(/^\/?/, "/?")
-                                .replace(/[\.]/g, "\\.")
-                                .replace(/\$page/g, "([\\w\\-]+)"));
+                        return new RegExp("^" + item.replace(/^\/?/, "/?").replace(/[\.]/g, "\\.").replace("$page", "([\\w\\-]+)"));
                     });
                     _config.routeResolve = function (name) {
                         return mainRoute.replace(/\$page/g, name);
@@ -742,7 +704,7 @@ const config = {
     },
     setConfig: function (key, value) {
         if (isObject(key)) {
-            objEach(key, (k, v) => {
+            fns.objEach(key, (k, v) => {
                 this.set(k, v);
             });
         }
@@ -753,154 +715,62 @@ const config = {
     },
 };
 
-function createNavigationRedirectError(to, from) {
-    return createRouterError(from, to, NavigationFailureType.redirected, `[PTool]:当${from.url}跳转到${to.url}时由守卫执行了重定向`);
-}
-function createNavigationAbortedError(to, from) {
-    return createRouterError(from, to, NavigationFailureType.aborted, `[PTool]:当${from.url}跳转到${to.url}时由守卫中断了跳转`);
-}
-function createNavigationCancelledError(from, to) {
-    return createRouterError(from, to, NavigationFailureType.cancelled, `[PTool]:跳转取消 = (${from.url} => ${to.url}),执行新的跳转`);
-}
-function createNavigationDuplicatedError(from, to) {
-    const error = createRouterError(from, to, NavigationFailureType.duplicated, `[PTool]:避免重复跳转同一个页面，当前重复跳转页面路径 => "${from.url}".`);
-    // backwards compatible with the first introduction of Errors
-    error.name = "NavigationDuplicated";
-    return error;
-}
-function createRouterError(from, to, type, message) {
-    const error = new Error(message);
-    error._isRouter = true;
-    error.from = from;
-    error.to = to;
-    error.type = type;
-    return error;
-}
-
-class Router extends Emit {
-    constructor() {
-        super();
-        this.errorCbs = [];
-        this.beforeRoute = [];
-        this.afterRoute = [];
-    }
-    navigateTo(cfg) {
-        return this.route("navigateTo", cfg, [].slice.call(arguments));
-    }
-    redirectTo(cfg) {
-        return this.route("redirectTo", cfg, [].slice.call(arguments));
-    }
-    switchTab(cfg) {
-        return this.route("switchTab", cfg, [].slice.call(arguments));
-    }
-    reLaunch(cfg) {
-        return this.route("reLaunch", cfg, [].slice.call(arguments));
-    }
-    navigateBack(cfg) {
-        return this.route("navigateBack", cfg, [].slice.call(arguments));
-    }
-    route(type, cfg, args) {
-        if (cfg.name) {
-            cfg.url = bridge.getPageUrlByName(cfg.name);
-        }
-        const currentPageUrl = bridge.getPage().route;
-        const route = { url: cfg.url, name: bridge.getPageName(cfg.url) };
-        const current = { url: currentPageUrl, name: bridge.getPageName(currentPageUrl) };
-        const abort = (err) => {
-            if (this.errorCbs.length) {
-                this.errorCbs.forEach((errFn) => {
-                    errFn(err);
-                });
-            }
-            else {
-                console.warn(err);
-            }
-            cfg.fail && cfg.fail(err);
-        };
-        if (cfg.url == "/" + currentPageUrl) {
-            return abort(createNavigationDuplicatedError(current, route));
-        }
-        this.pendding = cfg;
-        const iterator = (hook, next) => {
-            if (this.pendding !== cfg) {
-                return abort(createNavigationCancelledError(current, route));
-            }
-            hook(route, current, (to) => {
-                // 终止跳转且后续守卫不执行
-                if (to === false) {
-                    abort(createNavigationAbortedError(current, route));
-                    // do nothing
-                }
-                else if (isObject(to) && (isString(to.url) || isString(to.name))) {
-                    // 中断原有跳转改为跳转到其他地方
-                    to = to;
-                    if (isObject(to) && to.replace) {
-                        this.redirectTo(to);
-                    }
-                    else {
-                        try {
-                            this.navigateTo(to);
-                        }
-                        catch (_a) {
-                            this.switchTab(to);
-                        }
-                    }
-                    abort(createNavigationRedirectError(current, route));
-                }
-                else {
-                    next(to);
-                }
-            });
-        };
-        runQueue(this.beforeRoute, iterator, () => {
-            this.emit(type, cfg.url, cfg.params);
-            this.pendding = null;
-            // 会存在不兼容接口，例如：reLaunch
-            if (wx[type]) {
-                return wx[type].apply(wx, args);
-            }
-        });
-    }
-    redirectDelegate(target) {
-        ["navigateTo", "redirectTo", "switchTab", "reLaunch", "navigateBack"].map((methodName) => {
-            target[methodName] = this[methodName];
-        });
-    }
-    beforeEach(fn) {
-        return registerHook(this.beforeRoute, fn);
-    }
-    afterEach(fn) {
-        return registerHook(this.beforeRoute, fn);
-    }
-    onError(fn) {
-        this.errorCbs.push(fn);
+const exportee = new Emit();
+let timer, readyTimer, pending;
+exportee.on("page:ready", function () {
+    readyTimer = setTimeout(function () {
+        pending = false;
+    }, 100);
+});
+function route$1(type, cfg, args) {
+    if (pending)
+        return;
+    pending = true;
+    clearTimeout(timer);
+    clearTimeout(readyTimer);
+    let routeFrozenTime = config.get("routeFrozenTime");
+    /**
+     * 避免重复的跳转
+     */
+    timer = setTimeout(function () {
+        pending = false;
+    }, routeFrozenTime);
+    exportee.emit(type, cfg.url, cfg.params);
+    // 会存在不兼容接口，例如：reLaunch
+    if (wx[type]) {
+        return wx[type].apply(wx, args);
     }
 }
-const router = new Router();
+exportee.navigateTo = function (cfg) {
+    return route$1("navigateTo", cfg, [].slice.call(arguments));
+};
+exportee.redirectTo = function (cfg) {
+    return route$1("redirectTo", cfg, [].slice.call(arguments));
+};
+exportee.switchTab = function (cfg) {
+    return route$1("switchTab", cfg, [].slice.call(arguments));
+};
+exportee.reLaunch = function (cfg) {
+    return route$1("reLaunch", cfg, [].slice.call(arguments));
+};
+exportee.navigateBack = function () {
+    return wx.navigateBack.apply(wx, [].slice.call(arguments));
+};
+exportee.redirectDelegate = function (target) {
+    ["navigateTo", "redirectTo", "switchTab", "reLaunch", "navigateBack"].map((methodName) => {
+        target[methodName] = exportee[methodName];
+    });
+};
 
 const navigate = route({ type: "navigateTo" });
 const redirect = route({ type: "redirectTo" });
 const switchTab = route({ type: "switchTab" });
 const reLaunch = route({ type: "reLaunch" });
-const navigateBack = (option) => {
-    router.navigateBack(option);
-};
 var bridge = {
     redirectDelegate: function (emitter, dispatcher) {
-        ["navigateTo", "redirectTo", "switchTab", "reLaunch", "navigateBack"].forEach(function (k) {
+        ["navigateTo", "redirectTo", "switchTab", "reLaunch"].forEach(function (k) {
             emitter.on(k, function (url, params) {
-                let name;
-                if (k === "navigateBack") {
-                    let backPage = getCurrentPages()[getCurrentPages().length - 2];
-                    console.log("backPage", backPage);
-                    if (backPage) {
-                        name = getPageName("/" + backPage.route);
-                    }
-                }
-                else {
-                    name = getPageName(url);
-                }
-                console.log(k + ":" + name, url, params);
+                var name = getPageName(url);
                 name && dispatcher.emit(k + ":" + name, url, params);
             });
         });
@@ -929,7 +799,7 @@ var bridge = {
         ctx.$redirect = redirect;
         ctx.$switch = switchTab;
         ctx.$reLaunch = reLaunch;
-        ctx.$back = navigateBack;
+        ctx.$back = back;
         /**
          * 页面预加载
          */
@@ -940,34 +810,31 @@ var bridge = {
         ctx.$curPage = getPage;
         ctx.$curPageName = curPageName;
     },
-    getPageUrlByName,
     getPageName,
-    getPage,
 };
 function route({ type }) {
     return function (url, option) {
-        const pagepath = getPageUrlByName(url);
+        var parts = url.split(/\?/);
+        var pagepath = parts[0];
+        if (/^[\w\-]+$/.test(pagepath)) {
+            pagepath = (config.get("customRouteResolve") || config.get("routeResolve"))(pagepath);
+        }
+        if (!pagepath) {
+            // @ts-ignore
+            throw new Error("Invalid path:", pagepath);
+        }
         option = option || {};
         // append querystring
         option.url = `${pagepath}${option.params ? "?encodeData=" + encodeURI(JSON.stringify(option.params)) : ""}`;
-        router[type](option);
+        exportee[type](option);
     };
+}
+function back(delta, config) {
+    wx.navigateBack(Object.assign({ delta: delta || 1 }, config));
 }
 function preload(url, params) {
     var name = getPageName(url);
     name && dispatcher && dispatcher.emit("preload:" + name, url, params);
-}
-function getPageUrlByName(url) {
-    var parts = url.split(/\?/);
-    var pagepath = parts[0];
-    if (/^[\w\-]+$/.test(pagepath)) {
-        pagepath = (config.get("customRouteResolve") || config.get("routeResolve"))(pagepath);
-    }
-    if (!pagepath) {
-        // @ts-ignore
-        throw new Error("Invalid path:", pagepath);
-    }
-    return pagepath;
 }
 function getPage() {
     return getCurrentPages().slice(0).pop();
@@ -983,7 +850,6 @@ function curPageName() {
     return getPageName(route);
 }
 
-const defaultState = { lifeState: PageState.pendding, preloadFn: null };
 // 总事件管理
 function IPage(name, option) {
     if (isObject(name)) {
@@ -991,7 +857,7 @@ function IPage(name, option) {
         name = option.name || "_unknow";
     }
     option.$name = name;
-    option.$state = JSON.parse(JSON.stringify(defaultState));
+    option.$state = { lifeState: PageState.pendding, preloadFn: null };
     // 页面是否存活
     option.$isPageAlive = function () {
         var _a;
@@ -1002,33 +868,21 @@ function IPage(name, option) {
         usePageStore(option, stateProxy.store);
     }
     if (option.onNavigate) {
-        assert(name !== "_unknow", "用到onNavigate方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
         let onNavigateHandler = function (url, params) {
             option.onNavigate({ url, params });
         };
+        assert(name !== "_unknow", "用到onNavigate方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
         console.log(`Page[${name}] define "onNavigate"`);
         dispatcher.on(`navigateTo:${name}`, onNavigateHandler);
         dispatcher.on(`redirectTo:${name}`, onNavigateHandler);
         dispatcher.on(`switchTabTo:${name}`, onNavigateHandler);
         dispatcher.on(`reLaunchTo:${name}`, onNavigateHandler);
     }
-    if (option.onBack) {
-        assert(name !== "_unknow", "用到onBack方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
-        let onNavigateBackHandler = function (params) {
-            option.onBack(params);
-        };
-        console.log(`Page[${name}] define "onBack"`);
-        dispatcher.on(`navigateBack:${name}`, onNavigateBackHandler);
-    }
-    option.onLoad = wrapFun(option.onLoad, function (onLoadOption) {
+    option.onLoad = fns.wrapFun(option.onLoad, function (onLoadOption) {
         if (onLoadOption === null || onLoadOption === void 0 ? void 0 : onLoadOption.encodeData) {
             // 转化页面参数
             onLoadOption.params = JSON.parse(decodeURI(onLoadOption.encodeData));
             delete onLoadOption.encodeData;
-        }
-        // 防止 热更新时页面报错
-        if (!!this.$state == false) {
-            this.$state = JSON.parse(JSON.stringify(defaultState));
         }
         this.$state.lifeState = PageState.loading;
         option.onAwake &&
@@ -1047,7 +901,7 @@ function IPage(name, option) {
             option.$state.preloadFn = option.onPreload({ url, params });
         });
         // preload将在onLoad时等待完成
-        option.onLoad = wrapFun(option.onLoad, function () {
+        option.onLoad = fns.wrapFun(option.onLoad, function () {
             if (this.$state.preloadFn) {
                 this.$state.preloadFn
                     .then((...args) => {
@@ -1061,14 +915,14 @@ function IPage(name, option) {
     }
     bridge.methods(option);
     option.$m = bridge.mountRef;
-    option.onReady = wrapFun(option.onReady, function () {
+    option.onReady = fns.wrapFun(option.onReady, function () {
         this.$state = this.$state || {};
         this.$state.lifeState = PageState.ready;
-        router.emit("page:ready");
+        exportee.emit("page:ready");
     });
-    option.onUnload = wrapFun(option.onReady, function () {
+    option.onUnload = fns.wrapFun(option.onReady, function () {
         this.$state.lifeState = PageState.unload;
-        router.emit("page:unload");
+        exportee.emit("page:unload");
     });
     if ("onPageLaunch" in option) {
         option.onPageLaunch();
@@ -1087,9 +941,9 @@ function IApp(option) {
     /**
      * APP sleep logical
      */
-    option.onShow = option.onShow ? wrapFun(option.onShow, appShowHandler) : appShowHandler;
-    option.onHide = option.onHide ? wrapFun(option.onHide, appHideHandler) : appHideHandler;
-    option.onLaunch = wrapFun(option.onLaunch, function () {
+    option.onShow = option.onShow ? fns.wrapFun(option.onShow, appShowHandler) : appShowHandler;
+    option.onHide = option.onHide ? fns.wrapFun(option.onHide, appHideHandler) : appHideHandler;
+    option.onLaunch = fns.wrapFun(option.onLaunch, function () {
         ctx = this;
     });
     if (option.onAwake) {
@@ -1118,7 +972,7 @@ function IComponent(option) {
     if (stateProxy.store) {
         useComponentStore(option, stateProxy.store);
     }
-    option.properties = extend({}, option.properties, {
+    option.properties = fns.extend({}, option.properties, {
         ref: {
             type: String,
             value: "",
@@ -1140,7 +994,7 @@ function IComponent(option) {
             },
         },
     });
-    option.lifetimes.attached = wrapFun(option.lifetimes.attached, function () {
+    option.lifetimes.attached = fns.wrapFun(option.lifetimes.attached, function () {
         bridge.methods && bridge.methods(this);
         this.$state = option.$state;
         this.$state.lifeState = ComponentState.attached;
@@ -1152,11 +1006,11 @@ function IComponent(option) {
         };
         this.triggerEvent("mount", this.$id);
     });
-    option.lifetimes.ready = wrapFun(option.lifetimes.ready, function () {
+    option.lifetimes.ready = fns.wrapFun(option.lifetimes.ready, function () {
         this.$state = this.$state || {};
         this.$state.lifeState = ComponentState.ready;
     });
-    option.lifetimes.detached = wrapFun(option.lifetimes.detached, function () {
+    option.lifetimes.detached = fns.wrapFun(option.lifetimes.detached, function () {
         dispatcher.deleteRef(this.$id);
         let $refs = this.$parent && this.$parent.$refs;
         let refName = this._$ref;
@@ -1166,7 +1020,7 @@ function IComponent(option) {
         this.$parent = null;
         this.$state.lifeState = ComponentState.detached;
     });
-    option.methods = extend({}, option.methods, {
+    option.methods = fns.extend({}, option.methods, {
         _$attached: function (parent) {
             this.$root = parent.$root || parent;
             this.$parent = parent;
@@ -1180,13 +1034,11 @@ const PTool = {
     Page: IPage,
     Component: IComponent,
     App: IApp,
-    router: router,
     store: stateProxy.store,
     createStore: dispatcher.createStore,
 };
 stateProxy.eventBus.assign(PTool);
-bridge.redirectDelegate(router, dispatcher);
-router.redirectDelegate(PTool);
+exportee.redirectDelegate(PTool);
 // 自动注入PTool到全局
 Object.defineProperty(Object.prototype, "PTool", {
     value: PTool,
@@ -1195,3 +1047,9 @@ Object.defineProperty(Object.prototype, "PTool", {
 });
 
 module.exports = PTool;
+
+}, function(modId) {var map = {}; return __REQUIRE__(map[modId], modId); })
+return __REQUIRE__(1675042454542);
+})()
+//miniprogram-npm-outsideDeps=[]
+//# sourceMappingURL=index.js.map

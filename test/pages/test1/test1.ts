@@ -21,12 +21,22 @@ PTool.Page("test1", {
   changeName() {
     this.$store.dispatch("test/changeName", 123123);
   },
-  onLoad() {},
+  onLoad() {
+    setTimeout(() => {
+      this.$back({
+        params: {
+          refresh: true,
+        },
+      });
+    }, 4000);
+  },
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady() {},
-
+  onNavigate() {
+    console.log("test1: navigate");
+  },
   /**
    * 生命周期函数--监听页面显示
    */

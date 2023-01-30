@@ -10,3 +10,9 @@ export enum ComponentState {
   ready = 2,
   detached = 3,
 }
+export enum NavigationFailureType {
+  redirected = 2,
+  aborted = 4,
+  cancelled = 8,
+  duplicated = 16,
+}

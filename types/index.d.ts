@@ -77,12 +77,13 @@ declare global {
       assign(target: object): void;
     }
 
-    interface NavigateToOption extends WechatMiniprogram.NavigateToOption {
+    interface NavigateToOption extends Omit<WechatMiniprogram.NavigateToOption, "url"> {
+      url?: string;
       // 页面参数
       params?: any;
     }
     /** 页面跳转API */
-    interface Redirector {
+    interface Router {
       /**
        * 导航到指定页面
        * 本函数是`wx.navigateTo`的封装。跳转到指定页面，`pagename`可以带上`queryString`
@@ -124,23 +125,17 @@ declare global {
        * 本函数是`wx.reLaunch`的封装。跳转到指定页面。`pagename`可以带上`queryString`
        * @param pagename 页面名称或页面的路径
        * @param config 传递给 `wx.reLaunch` api的参数(url会自动由`pagename`解析的结果填充)
-       * 示例：
        */
       $reLaunch(pagename: string, config?: NavigateToOption): void;
 
       /**
        * 返回上一页，`wx.navigateBack` 的封装
-       * @param delta 返回的层数，默认为`1`
-       * 示例：
-       * ```js
-       * this.$back();
-       * this.$back(2);
-       * ```
+       * 会触发对应页面的 `onBack` 生命周期
        */
-      $back(delta?: number, config?: Omit<WechatMiniprogram.NavigateBackOption, "delta">): void;
+      $back(config?: NavigateToOption): void;
 
       /**
-       * 提前预加载指定页面 (会触发对应页面的 `onPreload` 声明周期)
+       * 提前预加载指定页面 (会触发对应页面的 `onPreload` 生命周期)
        * @param pagename 页面名称或页面的路径，可以带上`queryString`
        * @param params 可以传对象作为页面参数，目标页接收将通过option.params的方式接收
        * 示例：
@@ -159,17 +154,8 @@ declare global {
       store: typeof Store;
     }
     type navigate = (c: NavigateToOption) => void;
-    interface NavigateMethod<T extends object = any> {
-      // @ts-ignore
-      navigateTo: navigate;
-      redirectTo: navigate;
-      switchTab: navigate;
-      reLaunch: navigate;
-      navigateBack: () => void;
-      redirectDelegate: (t: T) => void;
-    }
     /** 页面实例 */
-    interface PageInstance extends Redirector {
+    interface PageInstance extends Router {
       /** 当前页面名称 */
       $name: string;
 
@@ -187,7 +173,7 @@ declare global {
     }
 
     /** 组件实例 */
-    interface ComponentInstance<D extends WechatMiniprogram.Component.DataOption> extends Redirector {
+    interface ComponentInstance<D extends WechatMiniprogram.Component.DataOption> extends Router {
       /** 当前组件所属的页面组件实例 只在 `attached`, `ready`生命周期后生效 */
       $root: any;
       $store: Omit<Store, "_actions" | "_modules" | "_modulesNamespaceMap" | "_wrappedGetters">;
@@ -268,15 +254,32 @@ declare global {
       forEachAction(fn: any): void;
     }
 
-    interface NavigateMethod<T extends object = any> {
-      // @ts-ignore
+    interface Router<T extends object = any> {
+      beforeEach: (fn: NavigationGuard) => Function;
+      afterEach: (fn: NavigationGuard) => Function;
       navigateTo: navigate;
       redirectTo: navigate;
       switchTab: navigate;
       reLaunch: navigate;
-      navigateBack: () => void;
+      navigateBack: navigate;
       redirectDelegate: (t: T) => void;
     }
+    type urlNeed = { url: string };
+    type urlUnNeed = { url?: string };
+    interface Route extends Omit<WechatMiniprogram.NavigateToOption, "url"> {
+      name: string;
+      url?: string;
+      replace?: boolean;
+    }
+    interface RouteNeedUrl extends WechatMiniprogram.NavigateToOption {
+      url: string;
+      name?: string;
+      replace?: boolean;
+    }
+    type NavigationGuardNext = (to?: Route | RouteNeedUrl | false | void) => void;
+
+    type NavigationGuard = (to: Route | RouteNeedUrl, from: Route | RouteNeedUrl, next: NavigationGuardNext) => any;
+
     interface StoreRootModule<T = any> {
       // 状态
       state?: object;
@@ -372,10 +375,11 @@ declare global {
     App: PToolSpace.App.WXConstructor;
     Component: PToolSpace.Component.WXConstructor;
     Page: PToolSpace.Page.WXConstructor;
+    router: PToolSpace.Router;
     store?: PToolSpace.Store;
     createStore: (store: PToolSpace.StoreRootModule) => void;
   } & PToolSpace.Emit &
-    PToolSpace.NavigateMethod;
+    PToolSpace.Router;
   type PToolStoreModule<T> = PToolSpace.StoreModule<T>;
 }
 declare let PToolExport: string;

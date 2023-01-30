@@ -1,4 +1,4 @@
-import fns from "../utils/fns";
+import { extend, wrapFun } from "../utils/fns";
 import { ComponentState } from "./const";
 import bridge from "./bridge";
 import { dispatcher, stateProxy } from "./state";
@@ -12,7 +12,7 @@ function IComponent(option) {
   if (stateProxy.store) {
     useComponentStore(option, stateProxy.store);
   }
-  option.properties = fns.extend({}, option.properties, {
+  option.properties = extend({}, option.properties, {
     ref: {
       type: String,
       value: "",
@@ -34,7 +34,7 @@ function IComponent(option) {
       },
     },
   });
-  option.lifetimes.attached = fns.wrapFun(option.lifetimes.attached, function () {
+  option.lifetimes.attached = wrapFun(option.lifetimes.attached, function () {
     bridge.methods && bridge.methods(this);
     this.$state = option.$state;
     this.$state.lifeState = ComponentState.attached;
@@ -46,11 +46,11 @@ function IComponent(option) {
     };
     this.triggerEvent("mount", this.$id);
   });
-  option.lifetimes.ready = fns.wrapFun(option.lifetimes.ready, function () {
+  option.lifetimes.ready = wrapFun(option.lifetimes.ready, function () {
     this.$state = this.$state || {};
     this.$state.lifeState = ComponentState.ready;
   });
-  option.lifetimes.detached = fns.wrapFun(option.lifetimes.detached, function () {
+  option.lifetimes.detached = wrapFun(option.lifetimes.detached, function () {
     dispatcher.deleteRef(this.$id);
     let $refs = this.$parent && this.$parent.$refs;
     let refName = this._$ref;
@@ -60,7 +60,7 @@ function IComponent(option) {
     this.$parent = null;
     this.$state.lifeState = ComponentState.detached;
   });
-  option.methods = fns.extend({}, option.methods, {
+  option.methods = extend({}, option.methods, {
     _$attached: function (parent) {
       this.$root = parent.$root || parent;
       this.$parent = parent;

@@ -2,7 +2,23 @@ import "./lib/ptool.esm";
 import store from "./store/index";
 // import { PTool } from "./typings/ptool";
 // PTool.App({
+
+// import "wx-ez-tool";
+
 PTool.createStore(store);
+PTool.router.beforeEach((to, from, next) => {
+  next();
+});
+PTool.router.beforeEach((to, from, next) => {
+  next();
+});
+PTool.router.beforeEach((to, from, next) => {
+  if (to.name == "logs") {
+    next({ name: "test1" });
+    return;
+  }
+  next();
+});
 PTool.App({
   config: {
     route: "/pages/$page/$page",

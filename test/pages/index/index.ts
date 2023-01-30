@@ -20,6 +20,9 @@ PTool.Page("index", {
       url: "../logs/logs",
     });
   },
+  onBack(params: any) {
+    console.log(params);
+  },
   onLoad() {
     this.setData({
       canIUseGetUserProfile: true,

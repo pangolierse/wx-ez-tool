@@ -70,7 +70,7 @@ declare namespace PToolSpace {
     params?: any;
   }
   /** 页面跳转API */
-  interface Redirector {
+  interface Router {
     /**
      * 导航到指定页面
      * 本函数是`wx.navigateTo`的封装。跳转到指定页面，`pagename`可以带上`queryString`
@@ -157,7 +157,7 @@ declare namespace PToolSpace {
     redirectDelegate: (t: T) => void;
   }
   /** 页面实例 */
-  interface PageInstance extends Redirector {
+  interface PageInstance extends Router {
     /** 当前页面名称 */
     $name: string;
 
@@ -175,7 +175,7 @@ declare namespace PToolSpace {
   }
 
   /** 组件实例 */
-  interface ComponentInstance<D extends WechatMiniprogram.Component.DataOption> extends Redirector {
+  interface ComponentInstance<D extends WechatMiniprogram.Component.DataOption> extends Router {
     /** 当前组件所属的页面组件实例 只在 `attached`, `ready`生命周期后生效 */
     $root: any;
 

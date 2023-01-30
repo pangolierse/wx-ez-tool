@@ -13,6 +13,10 @@ export const isBoolean = (target) => {
 export const isObject = (target) => {
   return Object.prototype.toString.call(target).search(/Object/) > -1;
 };
+/* 参数是否为object */
+export const isString = (target) => {
+  return Object.prototype.toString.call(target).search(/String/) > -1;
+};
 /* 参数是否为array */
 export const isArray = (target) => {
   return Object.prototype.toString.call(target).search(/Array/) > -1;
@@ -21,16 +25,16 @@ export const isFunction = (target) => {
   return Object.prototype.toString.call(target).search(/Function/) > -1;
 };
 export const toType = (target) => {
-  return Object.prototype.toString.call(target).split(' ')[1].replace(']', '');
+  return Object.prototype.toString.call(target).split(" ")[1].replace("]", "");
 };
 // 是否为假值（包括对象为空，数组为空）
 export const isFalse = (target) => {
   if (isArray(target)) {
-    if (JSON.stringify(target) == '[]') return true;
+    if (JSON.stringify(target) == "[]") return true;
     else return false;
   }
   if (isObject(target)) {
-    if (JSON.stringify(target) == '{}') return true;
+    if (JSON.stringify(target) == "{}") return true;
     else return false;
   }
   return !Boolean(target);
@@ -43,5 +47,5 @@ export const assert = (condition, msg) => {
 };
 // 是否是 Promise
 export function isPromise(val) {
-  return val && typeof val.then === 'function';
+  return val && typeof val.then === "function";
 }

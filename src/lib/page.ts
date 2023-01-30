@@ -1,11 +1,12 @@
-import fns from "../utils/fns";
+import { wrapFun } from "../utils/fns";
 import { isObject, assert } from "../utils/is";
 import { PageState } from "./const";
 import { dispatcher, stateProxy } from "./state";
 import bridge from "./bridge";
-import redirector from "./redirector";
+import router from "./router";
 import { usePageStore } from "./store/index";
 import { toPromise } from "@/utils";
+const defaultState = { lifeState: PageState.pendding, preloadFn: null };
 // 总事件管理
 function IPage(name, option) {
   if (isObject(name)) {
@@ -13,7 +14,7 @@ function IPage(name, option) {
     name = option.name || "_unknow";
   }
   option.$name = name;
-  option.$state = { lifeState: PageState.pendding, preloadFn: null };
+  option.$state = JSON.parse(JSON.stringify(defaultState));
   // 页面是否存活
   option.$isPageAlive = function () {
     return this.$state?.lifeState !== PageState.unload;
@@ -23,21 +24,33 @@ function IPage(name, option) {
     usePageStore(option, stateProxy.store);
   }
   if (option.onNavigate) {
+    assert(name !== "_unknow", "用到onNavigate方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
     let onNavigateHandler = function (url, params) {
       option.onNavigate({ url, params });
     };
-    assert(name !== "_unknow", "用到onNavigate方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
     console.log(`Page[${name}] define "onNavigate"`);
     dispatcher.on(`navigateTo:${name}`, onNavigateHandler);
     dispatcher.on(`redirectTo:${name}`, onNavigateHandler);
     dispatcher.on(`switchTabTo:${name}`, onNavigateHandler);
     dispatcher.on(`reLaunchTo:${name}`, onNavigateHandler);
   }
-  option.onLoad = fns.wrapFun(option.onLoad, function (onLoadOption) {
+  if (option.onBack) {
+    assert(name !== "_unknow", "用到onBack方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
+    let onNavigateBackHandler = function (params) {
+      option.onBack(params);
+    };
+    console.log(`Page[${name}] define "onBack"`);
+    dispatcher.on(`navigateBack:${name}`, onNavigateBackHandler);
+  }
+  option.onLoad = wrapFun(option.onLoad, function (onLoadOption) {
     if (onLoadOption?.encodeData) {
       // 转化页面参数
       onLoadOption.params = JSON.parse(decodeURI(onLoadOption.encodeData));
       delete onLoadOption.encodeData;
+    }
+    // 防止 热更新时页面报错
+    if (!!this.$state == false) {
+      this.$state = JSON.parse(JSON.stringify(defaultState));
     }
     this.$state.lifeState = PageState.loading;
     option.onAwake &&
@@ -56,7 +69,7 @@ function IPage(name, option) {
       option.$state.preloadFn = option.onPreload({ url, params });
     });
     // preload将在onLoad时等待完成
-    option.onLoad = fns.wrapFun(option.onLoad, function () {
+    option.onLoad = wrapFun(option.onLoad, function () {
       if (this.$state.preloadFn) {
         this.$state.preloadFn
           .then((...args) => {
@@ -70,14 +83,14 @@ function IPage(name, option) {
   }
   bridge.methods(option);
   option.$m = bridge.mountRef;
-  option.onReady = fns.wrapFun(option.onReady, function () {
+  option.onReady = wrapFun(option.onReady, function () {
     this.$state = this.$state || {};
     this.$state.lifeState = PageState.ready;
-    redirector.emit("page:ready");
+    router.emit("page:ready");
   });
-  option.onUnload = fns.wrapFun(option.onReady, function () {
+  option.onUnload = wrapFun(option.onReady, function () {
     this.$state.lifeState = PageState.unload;
-    redirector.emit("page:unload");
+    router.emit("page:unload");
   });
   if ("onPageLaunch" in option) {
     option.onPageLaunch();

@@ -1,15 +1,29 @@
 import config from "./config";
 import { dispatcher } from "./state";
-import redirector from "./redirector";
+import router from "./router";
+import { NavigateToOption } from "@/types/type";
 const navigate = route({ type: "navigateTo" });
 const redirect = route({ type: "redirectTo" });
 const switchTab = route({ type: "switchTab" });
 const reLaunch = route({ type: "reLaunch" });
+const navigateBack = (option: NavigateToOption) => {
+  router.navigateBack(option);
+};
 export default {
   redirectDelegate: function (emitter, dispatcher) {
-    ["navigateTo", "redirectTo", "switchTab", "reLaunch"].forEach(function (k) {
+    ["navigateTo", "redirectTo", "switchTab", "reLaunch", "navigateBack"].forEach(function (k) {
       emitter.on(k, function (url, params) {
-        var name = getPageName(url);
+        let name;
+        if (k === "navigateBack") {
+          let backPage = getCurrentPages()[getCurrentPages().length - 2];
+          console.log("backPage", backPage);
+          if (backPage) {
+            name = getPageName("/" + backPage.route);
+          }
+        } else {
+          name = getPageName(url);
+        }
+        console.log(k + ":" + name, url, params);
         name && dispatcher.emit(k + ":" + name, url, params);
       });
     });
@@ -37,7 +51,7 @@ export default {
     ctx.$redirect = redirect;
     ctx.$switch = switchTab;
     ctx.$reLaunch = reLaunch;
-    ctx.$back = back;
+    ctx.$back = navigateBack;
     /**
      * 页面预加载
      */
@@ -48,36 +62,35 @@ export default {
     ctx.$curPage = getPage;
     ctx.$curPageName = curPageName;
   },
+  getPageUrlByName,
   getPageName,
+  getPage,
 };
 
 function route({ type }) {
   return function (url, option) {
-    var parts = url.split(/\?/);
-    var pagepath = parts[0];
-    if (/^[\w\-]+$/.test(pagepath)) {
-      pagepath = (config.get("customRouteResolve") || config.get("routeResolve"))(pagepath) as string;
-    }
-    if (!pagepath) {
-      // @ts-ignore
-      throw new Error("Invalid path:", pagepath);
-    }
+    const pagepath = getPageUrlByName(url);
     option = option || {};
     // append querystring
     option.url = `${pagepath}${option.params ? "?encodeData=" + encodeURI(JSON.stringify(option.params)) : ""}`;
-    redirector[type](option);
+    router[type](option);
   };
-}
-
-function back(delta, config) {
-  wx.navigateBack({
-    delta: delta || 1,
-    ...config,
-  });
 }
 function preload(url, params) {
   var name = getPageName(url);
   name && dispatcher && dispatcher.emit("preload:" + name, url, params);
+}
+function getPageUrlByName(url) {
+  var parts = url.split(/\?/);
+  var pagepath = parts[0];
+  if (/^[\w\-]+$/.test(pagepath)) {
+    pagepath = (config.get("customRouteResolve") || config.get("routeResolve"))(pagepath) as string;
+  }
+  if (!pagepath) {
+    // @ts-ignore
+    throw new Error("Invalid path:", pagepath);
+  }
+  return pagepath;
 }
 function getPage() {
   return getCurrentPages().slice(0).pop();

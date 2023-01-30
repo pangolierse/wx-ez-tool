@@ -13,10 +13,13 @@ interface Emit {
   // 给对象提供当前事件管理器的所有方法（语法糖）
   assign(target: object): void;
 }
+interface ErrCallBack extends WechatMiniprogram.GeneralCallbackResult {}
 
 interface NavigateToOption extends WechatMiniprogram.NavigateToOption {
+  name?: string;
   // 页面参数
   params?: any;
+  fail?: (res: ErrCallBack) => void;
 }
 interface ToolState {
   refs: Record<string, any>;
@@ -32,7 +35,7 @@ interface NavigateMethod<T extends object = any> {
   redirectTo: navigate;
   switchTab: navigate;
   reLaunch: navigate;
-  navigateBack: () => void;
+  navigateBack: (c: Omit<NavigateToOption, "url">) => void;
   redirectDelegate: (t: T) => void;
 }
 interface StoreRootModule {
@@ -46,3 +49,12 @@ interface StoreModule extends StoreRootModule {
   namespaced: string;
 }
 type getter = (state: object, getters: Record<string, getter>, rootState: object, rootGetters: Record<string, getter>) => any;
+
+type NavigationGuardNext = (to?: Route | false | void) => void;
+
+type NavigationGuard = (to: Route, from: Route, next: NavigationGuardNext) => any;
+
+interface Route extends WechatMiniprogram.NavigateToOption {
+  name?: string;
+  replace?: boolean;
+}
