@@ -153,8 +153,9 @@ declare global {
       hideTime: number;
       eventBus: Emit;
       channel: Record<string, any>;
-      store: typeof Store;
+      store: Store;
     }
+
     type navigate = (c: NavigateToOption) => void;
     /** 页面实例 */
     interface PageInstance extends Router {
@@ -168,7 +169,7 @@ declare global {
       };
       /** 指定了 `ref` 的子组件实例Map */
       $refs: any;
-      $store: Omit<Store, "_actions" | "_modules" | "_modulesNamespaceMap" | "_wrappedGetters">;
+      $store: StoreUse;
       // 一次性存取
       $put: (key: string, value: any) => void;
       $take: (key: string) => any;
@@ -178,7 +179,7 @@ declare global {
     interface ComponentInstance<D extends WechatMiniprogram.Component.DataOption> extends Router {
       /** 当前组件所属的页面组件实例 只在 `attached`, `ready`生命周期后生效 */
       $root: any;
-      $store: Omit<Store, "_actions" | "_modules" | "_modulesNamespaceMap" | "_wrappedGetters">;
+      $store: StoreUse;
 
       /** 一些由PTool生成的组件状态 */
       $state: {
@@ -209,6 +210,9 @@ declare global {
        */
       $ref: any;
     }
+    interface AppInstance {
+      $store: StoreUse;
+    }
 
     class Store {
       _actions: Record<string, Function>;
@@ -224,6 +228,10 @@ declare global {
       dispatch(_type: any, _payload?: any): any;
       registerGetters(mapGetter: any, pageOrComponent: any, contextData: any): void;
     }
+    type StoreUse = Omit<
+      Store,
+      "_actions" | "_modules" | "_modulesNamespaceMap" | "_wrappedGetters" | "registerGetters" | "stateProxy"
+    >;
     class ModuleCollection {
       root: Module;
       constructor(rawRootModule: StoreRootModule);
@@ -365,7 +373,7 @@ declare global {
 
     namespace App {
       type Option = WechatMiniprogram.App.Option;
-      type WXInstance<T extends IAnyObject> = Option & T;
+      type WXInstance<T extends IAnyObject> = Option & T & PToolSpace.AppInstance;
 
       type WXOption<T extends IAnyObject> = Partial<PToolSpace.AppOption> & Partial<Option> & T & ThisType<WXInstance<T>>;
 

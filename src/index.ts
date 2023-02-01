@@ -16,7 +16,6 @@ Object.defineProperty(PTool, "store", {
     return stateProxy.store;
   },
   configurable: false,
-  writable: false,
 });
 stateProxy.eventBus.assign(PTool);
 bridge.redirectDelegate(router, dispatcher);

@@ -24,6 +24,8 @@ PTool.App({
     route: "/pages/$page/$page",
   },
   onLaunch() {
+    PTool.store.dispatch("test/changeName","123123123")
+    // this.$store.dispatch("test/changeName","123123123")
     // 展示本地存储能力
     const logs = wx.getStorageSync("logs") || [];
     logs.unshift(Date.now());
