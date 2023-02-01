@@ -290,11 +290,12 @@ declare global {
 
     type NavigationGuard = (to: Route | RouteNeedUrl, from: Route | RouteNeedUrl, next: NavigationGuardNext) => any;
 
+    type StoreStateModel<T> = T & { model: T };
     interface StoreRootModule<T = any> {
       // 状态
-      state?: object;
-      getters?: Record<string, getter<T>>;
-      actions?: Record<string, action<T>>;
+      state?: T;
+      getters?: Record<string, getter<StoreStateModel<T>>>;
+      actions?: Record<string, action<StoreStateModel<T>>>;
       modules?: Record<string, StoreModule>;
     }
     interface StoreModule<T = any> extends StoreRootModule<T> {
@@ -343,7 +344,7 @@ declare global {
 
       interface WXConstructor {
         <D extends DataOption, C extends CustomOption>(name: string, options: WXOption<D, C>): void;
-        <D extends DataOption, C extends CustomOption>(options: Omit<WXOption<D, C>, "name"> & { name: string }): void;
+        <D extends DataOption, C extends CustomOption>(options: WXOption<D, C> & { name: string }): void;
       }
     }
 

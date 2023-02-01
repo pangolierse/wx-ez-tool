@@ -7,11 +7,20 @@ import router from "./router";
 import { usePageStore } from "./store/index";
 import { decryptParams, toPromise } from "@/utils";
 const defaultState = { lifeState: PageState.pendding, preloadFn: null };
+const namePool = {};
 // 总事件管理
 function IPage(name, option?) {
   if (isObject(name)) {
     option = name;
     name = option.name || "_unknow";
+  }
+  if (namePool[name]) {
+    assert(
+      true,
+      `存在重名路由${name}，请确认该路径名称是否重复 // PS：目前没找到更好的页面名称设置的逻辑，如果有更好的思路欢迎到https://github.com/pangolierse/wx-ez-tool提`,
+    );
+  } else {
+    namePool[name] = true;
   }
   option.$name = name;
   option.$state = JSON.parse(JSON.stringify(defaultState));
