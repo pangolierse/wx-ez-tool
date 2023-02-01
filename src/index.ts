@@ -9,9 +9,15 @@ const PTool = {
   Component: IComponent,
   App: IApp,
   router: router,
-  store: stateProxy.store,
   createStore: dispatcher.createStore,
 };
+Object.defineProperty(PTool, "store", {
+  get() {
+    return stateProxy.store;
+  },
+  configurable: false,
+  writable: false,
+});
 stateProxy.eventBus.assign(PTool);
 bridge.redirectDelegate(router, dispatcher);
 router.redirectDelegate(PTool);

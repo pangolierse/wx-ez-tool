@@ -8,6 +8,8 @@ declare global {
     }
     /** 页面注册选项 */
     interface PageOption {
+      // 页面名称
+      name?: string;
       // 如果有启用store状态管理的话，mapGetters可以映射store中的getters
       mapGetters?: Record<string, string>;
       /**
@@ -219,7 +221,7 @@ declare global {
       set state(v: any);
       get getters(): Record<string, (store: Store) => getter>;
       set getters(v: Record<string, (store: Store) => getter>);
-      dispatch(_type: any, _payload: any): any;
+      dispatch(_type: any, _payload?: any): any;
       registerGetters(mapGetter: any, pageOrComponent: any, contextData: any): void;
     }
     class ModuleCollection {
@@ -333,6 +335,7 @@ declare global {
 
       interface WXConstructor {
         <D extends DataOption, C extends CustomOption>(name: string, options: WXOption<D, C>): void;
+        <D extends DataOption, C extends CustomOption>(options: Omit<WXOption<D, C>, "name"> & { name: string }): void;
       }
     }
 
@@ -376,7 +379,7 @@ declare global {
     Component: PToolSpace.Component.WXConstructor;
     Page: PToolSpace.Page.WXConstructor;
     router: PToolSpace.Router;
-    store?: PToolSpace.Store;
+    store: PToolSpace.Store;
     createStore: (store: PToolSpace.StoreRootModule) => void;
   } & PToolSpace.Emit &
     PToolSpace.Router;

@@ -1,52 +1,50 @@
 {
-  "description": "项目配置文件",
+  "description": "项目配置文件，详见文档：https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
   "packOptions": {
     "ignore": [],
     "include": []
   },
+  "miniprogramRoot": "",
+  "compileType": "miniprogram",
+  "projectname": "ts-sass-demo",
   "setting": {
     "useCompilerPlugins": [
-      "typescript"
+      "typescript",
+      "sass"
     ],
-    "bundle": false,
-    "userConfirmedBundleSwitch": false,
     "urlCheck": true,
-    "scopeDataCheck": false,
     "coverView": true,
     "es6": true,
     "postcss": true,
-    "compileHotReLoad": false,
     "lazyloadPlaceholderEnable": false,
     "preloadBackgroundData": false,
     "minified": true,
     "autoAudits": false,
-    "newFeature": false,
     "uglifyFileName": false,
     "uploadWithSourceMap": true,
-    "useIsolateContext": true,
-    "nodeModules": false,
     "enhance": true,
     "useMultiFrameRuntime": true,
-    "useApiHook": true,
-    "useApiHostProcess": true,
     "showShadowRootInWxmlPanel": true,
     "packNpmManually": false,
-    "enableEngineNative": false,
     "packNpmRelationList": [],
     "minifyWXSS": true,
+    "useStaticServer": true,
     "showES6CompileOption": false,
-    "minifyWXML": true,
+    "checkInvalidKey": true,
     "babelSetting": {
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "disableUseStrict": false,
+    "minifyWXML": true
   },
-  "compileType": "miniprogram",
-  "libVersion": "2.19.4",
-  "appid": "wx765d68b8b9cb69e7",
-  "projectname": "miniprogram-92",
+  "simulatorType": "wechat",
+  "simulatorPluginLibVersion": {},
   "condition": {},
+  "srcMiniprogramRoot": "miniprogram/",
+  "appid": "wx765d68b8b9cb69e7",
+  "libVersion": "2.24.3",
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2

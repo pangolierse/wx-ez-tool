@@ -8,7 +8,7 @@ import { usePageStore } from "./store/index";
 import { toPromise } from "@/utils";
 const defaultState = { lifeState: PageState.pendding, preloadFn: null };
 // 总事件管理
-function IPage(name, option) {
+function IPage(name, option?) {
   if (isObject(name)) {
     option = name;
     name = option.name || "_unknow";

@@ -19,12 +19,16 @@
     "lib": ["ES2020"],
     "typeRoots": [
       "./typings/index.d.ts"
-    ]
+    ],
+    "paths": {
+      "@/*": ["./*"],
+      "#/*": ["./types/*"]
+    }
   },
-  "include": [
-    "./**/*.ts"
-  ],
   "exclude": [
     "node_modules"
+  ],
+  "include": [
+    "./**/*.ts",
   ]
 }

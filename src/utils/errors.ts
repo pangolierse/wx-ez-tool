@@ -34,12 +34,14 @@ export function createNavigationDuplicatedError(from, to) {
 }
 
 export function createRouterError(from, to, type, message) {
-  const error: Error & {
+  const error: {
+    message: string;
+    name?: string;
     _isRouter?: boolean;
     to?: Route;
     from?: Route;
     type?: NavigationFailureType;
-  } = new Error(message);
+  } = { message };
   error._isRouter = true;
   error.from = from;
   error.to = to;

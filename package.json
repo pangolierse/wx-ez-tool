@@ -1,6 +1,6 @@
 {
   "name": "wx-ez-tool",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-beta",
   "description": "wx-ez-tool是一个轻量级微信小程序开发工具（原生）",
   "main": "lib/PTool.js",
   "types": "types/index.d.ts",

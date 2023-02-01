@@ -12,6 +12,9 @@ function IApp(option) {
   /**
    * APP sleep logical
    */
+  option.onLaunch = wrapFun(option.onLaunch, function () {
+    this.$store = stateProxy.store;
+  });
   option.onShow = option.onShow ? wrapFun(option.onShow, appShowHandler) : appShowHandler;
   option.onHide = option.onHide ? wrapFun(option.onHide, appHideHandler) : appHideHandler;
   option.onLaunch = wrapFun(option.onLaunch, function () {
