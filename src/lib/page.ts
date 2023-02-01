@@ -14,7 +14,7 @@ function IPage(name, option?) {
     option = name;
     name = option.name || "_unknow";
   }
-  if (namePool[name]) {
+  if (namePool[name] && name !== "_unknow") {
     assert(
       true,
       `存在重名路由${name}，请确认该路径名称是否重复 // PS：目前没找到更好的页面名称设置的逻辑，如果有更好的思路欢迎到https://github.com/pangolierse/wx-ez-tool提`,
