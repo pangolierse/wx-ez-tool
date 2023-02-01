@@ -1,4 +1,4 @@
-import { isPromise } from "./is";
+import { isPromise, isString } from "./is";
 
 export function find(list, f) {
   return list.filter(f)[0];
@@ -56,4 +56,29 @@ export function registerHook(list: Array<any>, fn: Function): Function {
     const i = list.indexOf(fn);
     if (i > -1) list.splice(i, 1);
   };
+}
+
+export function parseUrlParams(url) {
+  const params: Record<string, any> = {};
+  if (!isString(url) || url === "") return params;
+
+  url
+    .split("?")[1]
+    ?.split("&")
+    .map((paramsStr) => {
+      let [key, value] = paramsStr.split("=");
+      params[key] = value;
+    });
+  return params;
+}
+
+export function encryptionParams(params) {
+  return encodeURI(JSON.stringify(params));
+}
+export function decryptParams(paramsUrl: string) {
+  try {
+    return JSON.parse(decodeURI(paramsUrl));
+  } catch {
+    return {};
+  }
 }

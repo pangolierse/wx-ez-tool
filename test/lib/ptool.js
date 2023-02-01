@@ -193,6 +193,29 @@ function registerHook(list, fn) {
             list.splice(i, 1);
     };
 }
+function parseUrlParams(url) {
+    var _a;
+    const params = {};
+    if (!isString(url) || url === "")
+        return params;
+    (_a = url
+        .split("?")[1]) === null || _a === void 0 ? void 0 : _a.split("&").map((paramsStr) => {
+        let [key, value] = paramsStr.split("=");
+        params[key] = value;
+    });
+    return params;
+}
+function encryptionParams(params) {
+    return encodeURI(JSON.stringify(params));
+}
+function decryptParams(paramsUrl) {
+    try {
+        return JSON.parse(decodeURI(paramsUrl));
+    }
+    catch (_a) {
+        return {};
+    }
+}
 
 let activeEffect = null;
 let effectStack = [];
@@ -945,11 +968,18 @@ var bridge = {
     getPage,
 };
 function route({ type }) {
-    return function (url, option) {
+    return function (url, option = {}) {
         const pagepath = getPageUrlByName(url);
-        option = option || {};
+        const params = parseUrlParams(url);
+        if (params.encodeData) {
+            option = Object.assign(decryptParams(params.encodeData), option);
+            delete params.encodeData;
+        }
         // append querystring
-        option.url = `${pagepath}${option.params ? "?encodeData=" + encodeURI(JSON.stringify(option.params)) : ""}`;
+        const query = Object.entries(params)
+            .map((item) => item.join("="))
+            .join("&");
+        option.url = `${pagepath}${option.params ? "?encodeData=" + encryptionParams(option.params) : ""}${query ? "&" + query : ""}`;
         router[type](option);
     };
 }
@@ -1023,7 +1053,7 @@ function IPage(name, option) {
     option.onLoad = wrapFun(option.onLoad, function (onLoadOption) {
         if (onLoadOption === null || onLoadOption === void 0 ? void 0 : onLoadOption.encodeData) {
             // 转化页面参数
-            onLoadOption.params = JSON.parse(decodeURI(onLoadOption.encodeData));
+            onLoadOption.params = decryptParams(onLoadOption.encodeData);
             delete onLoadOption.encodeData;
         }
         // 防止 热更新时页面报错
@@ -1048,6 +1078,7 @@ function IPage(name, option) {
         });
         // preload将在onLoad时等待完成
         option.onLoad = wrapFun(option.onLoad, function () {
+            this.$state = this.$state || {};
             if (this.$state.preloadFn) {
                 this.$state.preloadFn
                     .then((...args) => {
@@ -1062,7 +1093,6 @@ function IPage(name, option) {
     bridge.methods(option);
     option.$m = bridge.mountRef;
     option.onReady = wrapFun(option.onReady, function () {
-        this.$state = this.$state || {};
         this.$state.lifeState = PageState.ready;
         router.emit("page:ready");
     });

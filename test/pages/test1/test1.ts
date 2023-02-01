@@ -1,4 +1,3 @@
-import { speack } from "@/utils/test";
 
 // pages/test1/test1.ts
 PTool.Page("test1", {
@@ -23,8 +22,8 @@ PTool.Page("test1", {
   changeName() {
     this.$store.dispatch("test/changeName", 123123);
   },
-  onLoad() {
-    speack()
+  onLoad(option) {
+    console.log(option)
     // setTimeout(() => {
     //   this.$back({
     //     params: {

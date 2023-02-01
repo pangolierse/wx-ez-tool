@@ -4,5 +4,18 @@
   "setting": {
     "compileHotReLoad": true
   },
-  "libVersion": "2.25.4"
+  "libVersion": "2.25.4",
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "",
+          "pathName": "pages/test1/test1",
+          "query": "encodeData=%257B%2522name%2522%3A1%257D&age=1",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
+  }
 }

@@ -5,7 +5,7 @@ import { dispatcher, stateProxy } from "./state";
 import bridge from "./bridge";
 import router from "./router";
 import { usePageStore } from "./store/index";
-import { toPromise } from "@/utils";
+import { decryptParams, toPromise } from "@/utils";
 const defaultState = { lifeState: PageState.pendding, preloadFn: null };
 // 总事件管理
 function IPage(name, option?) {
@@ -45,7 +45,7 @@ function IPage(name, option?) {
   option.onLoad = wrapFun(option.onLoad, function (onLoadOption) {
     if (onLoadOption?.encodeData) {
       // 转化页面参数
-      onLoadOption.params = JSON.parse(decodeURI(onLoadOption.encodeData));
+      onLoadOption.params = decryptParams(onLoadOption.encodeData);
       delete onLoadOption.encodeData;
     }
     // 防止 热更新时页面报错
@@ -70,6 +70,7 @@ function IPage(name, option?) {
     });
     // preload将在onLoad时等待完成
     option.onLoad = wrapFun(option.onLoad, function () {
+      this.$state = this.$state || {};
       if (this.$state.preloadFn) {
         this.$state.preloadFn
           .then((...args) => {
@@ -84,7 +85,6 @@ function IPage(name, option?) {
   bridge.methods(option);
   option.$m = bridge.mountRef;
   option.onReady = wrapFun(option.onReady, function () {
-    this.$state = this.$state || {};
     this.$state.lifeState = PageState.ready;
     router.emit("page:ready");
   });

@@ -2,6 +2,7 @@ import config from "./config";
 import { dispatcher } from "./state";
 import router from "./router";
 import { NavigateToOption } from "@/types/type";
+import { decryptParams, encryptionParams, parseUrlParams } from "@/utils";
 const navigate = route({ type: "navigateTo" });
 const redirect = route({ type: "redirectTo" });
 const switchTab = route({ type: "switchTab" });
@@ -68,11 +69,18 @@ export default {
 };
 
 function route({ type }) {
-  return function (url, option) {
+  return function (url, option: Record<string, any> = {}) {
     const pagepath = getPageUrlByName(url);
-    option = option || {};
+    const params = parseUrlParams(url);
+    if (params.encodeData) {
+      option = Object.assign(decryptParams(params.encodeData), option);
+      delete params.encodeData;
+    }
     // append querystring
-    option.url = `${pagepath}${option.params ? "?encodeData=" + encodeURI(JSON.stringify(option.params)) : ""}`;
+    const query = Object.entries(params)
+      .map((item) => item.join("="))
+      .join("&");
+    option.url = `${pagepath}${option.params ? "?encodeData=" + encryptionParams(option.params) : ""}${query ? "&" + query : ""}`;
     router[type](option);
   };
 }
