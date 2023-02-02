@@ -146,7 +146,7 @@ declare global {
        * this.$preload('/page/main?userName=xxx&action=xxx',{age:12});
        * ```
        */
-      $preload(pagename: string, params: any): void;
+      $preload(pagename: string, params?: any): void;
     }
     interface ToolState {
       refs: Record<string, typeof Component>;
@@ -344,7 +344,9 @@ declare global {
 
       interface WXConstructor {
         <D extends DataOption, C extends CustomOption>(name: string, options: WXOption<D, C>): void;
-        <D extends DataOption, C extends CustomOption>(options: WXOption<D, C> & { name: string }): void;
+      }
+      interface WXConstructor {
+        <D extends DataOption, C extends CustomOption>(options: WXOption<D, C> & { name?: string }): void;
       }
     }
 
