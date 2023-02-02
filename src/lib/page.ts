@@ -97,7 +97,7 @@ function IPage(name, option?) {
     this.$state.lifeState = PageState.ready;
     router.emit("page:ready");
   });
-  option.onUnload = wrapFun(option.onReady, function () {
+  option.onUnload = wrapFun(option.onUnload, function () {
     this.$state.lifeState = PageState.unload;
     router.emit("page:unload");
   });
