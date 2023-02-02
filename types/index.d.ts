@@ -340,7 +340,7 @@ declare global {
 
       type WXOption<D extends DataOption, C extends CustomOption> = Partial<PToolSpace.PageOption> &
         ThisType<WXInstance<D, C>> &
-        Options<D, C>;
+        Options<D, C> & { [index: string]: any };
 
       interface WXConstructor {
         <D extends DataOption, C extends CustomOption>(name: string, options: WXOption<D, C>): void;
@@ -359,16 +359,18 @@ declare global {
         M
       >;
       type WXInstance<D extends DataOption, P extends PropertyOption, M extends MethodOption> = PToolSpace.ComponentInstance<D> &
-        Instance<D, P, M>;
+        Instance<D, P, M> & { [index: string]: any };
 
       type WXOption<
         D extends DataOption,
         P extends PropertyOption,
         M extends MethodOption,
-      > = Partial<PToolSpace.ComponentOption> & ThisType<WXInstance<D, P, M>> & Options<D, P, M>;
+      > = Partial<PToolSpace.ComponentOption> & ThisType<WXInstance<D, P, M>> & Options<D, P, M> & { [index: string]: any };
 
       interface WXConstructor {
-        <D extends DataOption, P extends PropertyOption, M extends MethodOption>(options: WXOption<D, P, M>): string;
+        <D extends DataOption = any, P extends PropertyOption = any, M extends MethodOption = any>(
+          options: WXOption<D, P, M>,
+        ): string;
       }
     }
 
