@@ -1,15 +1,18 @@
 import { wrapFun } from "../utils/fns";
-import { isObject, assert } from "../utils/is";
+import * as fns from "../utils/fns";
+import { isObject, assert, isFunction } from "../utils/is";
 import { PageState } from "./const";
 import { dispatcher, stateProxy } from "./state";
 import bridge from "./bridge";
 import router from "./router";
 import { usePageStore } from "./store/index";
 import { decryptParams, toPromise } from "@/utils";
+import config from "./config";
 const defaultState = { lifeState: PageState.pendding, preloadFn: null };
 const namePool = {};
+type PageOption = PToolSpace.Page.Options<any, any> & PToolSpace.PageInstance;
 // 总事件管理
-function IPage(name, option?) {
+function IPage(name, option?: PageOption) {
   if (isObject(name)) {
     option = name;
     name = option.name || "_unknow";
@@ -32,6 +35,7 @@ function IPage(name, option?) {
   if (stateProxy.store) {
     usePageStore(option, stateProxy.store);
   }
+  loadBeforePageInitExtend(option);
   if (option.onNavigate) {
     assert(name !== "_unknow", "用到onNavigate方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
     let onNavigateHandler = function (url, params) {
@@ -45,13 +49,16 @@ function IPage(name, option?) {
   }
   if (option.onBack) {
     assert(name !== "_unknow", "用到onBack方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
-    let onNavigateBackHandler = function (params) {
-      option.onBack(params);
-    };
     console.log(`Page[${name}] define "onBack"`);
-    dispatcher.on(`navigateBack:${name}`, onNavigateBackHandler);
   }
   option.onLoad = wrapFun(option.onLoad, function (onLoadOption) {
+    // Back方法特殊处理可能需要获取到页面实例，所以放在onLoad的时候注册
+    if (option.onBack) {
+      let onNavigateBackHandler = (url, params) => {
+        this.onBack(params);
+      };
+      dispatcher.on(`navigateBack:${name}`, onNavigateBackHandler);
+    }
     if (onLoadOption?.encodeData) {
       // 转化页面参数
       onLoadOption.params = decryptParams(onLoadOption.encodeData);
@@ -104,7 +111,39 @@ function IPage(name, option?) {
   if ("onPageLaunch" in option) {
     option.onPageLaunch();
   }
+  loadafterPageInitExtend(option);
 
   return Page(option);
+}
+interface PageModule {
+  option: PageOption;
+  fns: typeof fns;
+  state: typeof stateProxy;
+  dispatcher: typeof dispatcher;
+}
+type PageExtend = (module: PageModule) => void;
+function loadBeforePageInitExtend(option: PageOption) {
+  const beforePageInitExtend: PageExtend = config.get("beforePageInitExtend") || null;
+  if (beforePageInitExtend) {
+    assert(isFunction(beforePageInitExtend), "beforePageInitExtend 必须为函数");
+    beforePageInitExtend({
+      option,
+      fns,
+      state: stateProxy,
+      dispatcher,
+    });
+  }
+}
+function loadafterPageInitExtend(option: PageOption) {
+  const afterPageInitExtend: PageExtend = config.get("afterPageInitExtend") || null;
+  if (afterPageInitExtend) {
+    assert(isFunction(afterPageInitExtend), "afterPageInitExtend 必须为函数");
+    afterPageInitExtend({
+      option,
+      fns,
+      state: stateProxy,
+      dispatcher,
+    });
+  }
 }
 export default IPage;

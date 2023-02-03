@@ -73,11 +73,11 @@ export function parseUrlParams(url) {
 }
 
 export function encryptionParams(params) {
-  return encodeURI(JSON.stringify(params));
+  return encodeURIComponent(JSON.stringify(params));
 }
 export function decryptParams(paramsUrl: string) {
   try {
-    return JSON.parse(decodeURI(paramsUrl));
+    return JSON.parse(decodeURIComponent(paramsUrl));
   } catch {
     return {};
   }

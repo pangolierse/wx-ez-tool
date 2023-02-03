@@ -90,6 +90,15 @@ function runQueue(queue, fn, cb) {
     step(0);
 }
 
+var fns = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  extend: extend,
+  hasOwn: hasOwn,
+  objEach: objEach,
+  runQueue: runQueue,
+  wrapFun: wrapFun
+});
+
 var PageState;
 (function (PageState) {
     PageState[PageState["pendding"] = 0] = "pendding";
@@ -204,11 +213,11 @@ function parseUrlParams(url) {
     return params;
 }
 function encryptionParams(params) {
-    return encodeURI(JSON.stringify(params));
+    return encodeURIComponent(JSON.stringify(params));
 }
 function decryptParams(paramsUrl) {
     try {
-        return JSON.parse(decodeURI(paramsUrl));
+        return JSON.parse(decodeURIComponent(paramsUrl));
     }
     catch (_a) {
         return {};
@@ -913,7 +922,6 @@ var bridge = {
                 let name;
                 if (k === "navigateBack") {
                     let backPage = getCurrentPages()[getCurrentPages().length - 2];
-                    console.log("backPage", backPage);
                     if (backPage) {
                         name = getPageName("/" + backPage.route);
                     }
@@ -921,7 +929,6 @@ var bridge = {
                 else {
                     name = getPageName(url);
                 }
-                console.log(k + ":" + name, url, params);
                 name && dispatcher.emit(k + ":" + name, url, params);
             });
         });
@@ -1012,11 +1019,18 @@ function curPageName() {
 }
 
 const defaultState = { lifeState: PageState.pendding, preloadFn: null };
+const namePool = {};
 // 总事件管理
 function IPage(name, option) {
     if (isObject(name)) {
         option = name;
         name = option.name || "_unknow";
+    }
+    if (namePool[name] && name !== "_unknow") {
+        assert(true, `存在重名路由${name}，请确认该路径名称是否重复 // PS：目前没找到更好的页面名称设置的逻辑，如果有更好的思路欢迎到https://github.com/pangolierse/wx-ez-tool提`);
+    }
+    else {
+        namePool[name] = true;
     }
     option.$name = name;
     option.$state = JSON.parse(JSON.stringify(defaultState));
@@ -1029,6 +1043,7 @@ function IPage(name, option) {
     if (stateProxy.store) {
         usePageStore(option, stateProxy.store);
     }
+    loadBeforePageInitExtend(option);
     if (option.onNavigate) {
         assert(name !== "_unknow", "用到onNavigate方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
         let onNavigateHandler = function (url, params) {
@@ -1042,13 +1057,16 @@ function IPage(name, option) {
     }
     if (option.onBack) {
         assert(name !== "_unknow", "用到onBack方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
-        let onNavigateBackHandler = function (params) {
-            option.onBack(params);
-        };
         console.log(`Page[${name}] define "onBack"`);
-        dispatcher.on(`navigateBack:${name}`, onNavigateBackHandler);
     }
     option.onLoad = wrapFun(option.onLoad, function (onLoadOption) {
+        // Back方法特殊处理可能需要获取到页面实例，所以放在onLoad的时候注册
+        if (option.onBack) {
+            let onNavigateBackHandler = (url, params) => {
+                this.onBack(params);
+            };
+            dispatcher.on(`navigateBack:${name}`, onNavigateBackHandler);
+        }
         if (onLoadOption === null || onLoadOption === void 0 ? void 0 : onLoadOption.encodeData) {
             // 转化页面参数
             onLoadOption.params = decryptParams(onLoadOption.encodeData);
@@ -1094,7 +1112,7 @@ function IPage(name, option) {
         this.$state.lifeState = PageState.ready;
         router.emit("page:ready");
     });
-    option.onUnload = wrapFun(option.onReady, function () {
+    option.onUnload = wrapFun(option.onUnload, function () {
         this.$state.lifeState = PageState.unload;
         router.emit("page:unload");
     });
@@ -1102,6 +1120,18 @@ function IPage(name, option) {
         option.onPageLaunch();
     }
     return Page(option);
+}
+function loadBeforePageInitExtend(option) {
+    const beforePageInitExtend = config.get("beforePageInitExtend") || null;
+    if (beforePageInitExtend) {
+        assert(isFunction(beforePageInitExtend), "beforePageInitExtend 必须为函数");
+        beforePageInitExtend({
+            option,
+            fns,
+            state: stateProxy,
+            dispatcher,
+        });
+    }
 }
 
 // @ts-ignore

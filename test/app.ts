@@ -22,6 +22,11 @@ PTool.router.beforeEach((to, from, next) => {
 PTool.App({
   config: {
     route: "/pages/$page/$page",
+    beforePageInitExtend:({option,fns}) => {
+      option.onLoad = fns.wrapFun(option.onLoad,function(){
+        console.log("每个页面都要console：",this.route)
+      })
+    }
   },
   onLaunch() {
     PTool.store.dispatch("test/changeName","123123123")

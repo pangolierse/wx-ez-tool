@@ -17,14 +17,12 @@ export default {
         let name;
         if (k === "navigateBack") {
           let backPage = getCurrentPages()[getCurrentPages().length - 2];
-          console.log("backPage", backPage);
           if (backPage) {
             name = getPageName("/" + backPage.route);
           }
         } else {
           name = getPageName(url);
         }
-        console.log(k + ":" + name, url, params);
         name && dispatcher.emit(k + ":" + name, url, params);
       });
     });
