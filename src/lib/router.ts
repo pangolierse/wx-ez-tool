@@ -40,12 +40,12 @@ class Router extends Emit {
   reLaunch(cfg: NavigateToOption) {
     return this.route("reLaunch", cfg, [].slice.call(arguments));
   }
-  navigateBack(cfg: NavigateToOption) {
+  navigateBack(cfg: any = {}) {
     return this.route("navigateBack", cfg, [].slice.call(arguments));
   }
   route(type: routeMethod, cfg: NavigateToOption, args: any[]) {
     if (type === "navigateBack") {
-      this.emit(type, cfg.url, cfg.params);
+      this.emit(type, "", cfg.params);
       return wx[type].apply(wx, args);
     }
     if (cfg.name) {
