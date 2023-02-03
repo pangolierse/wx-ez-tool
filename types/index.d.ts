@@ -234,7 +234,7 @@ declare global {
        * ```
        *
        * ```js
-       * Page.P({
+       * PTool.Page({
        *   onLoad: function () {
        *     this.$refs.customComp // 根据ref属性获取子组件的实例引用
        *   }
@@ -369,7 +369,7 @@ declare global {
       type CustomOption = WechatMiniprogram.Page.CustomOption;
       type Options<D, C> = WechatMiniprogram.Page.Options<D, C>;
       type WXInstance<D extends DataOption, C extends CustomOption> = PToolSpace.PageInstance &
-        WechatMiniprogram.Page.Instance<D, C>;
+        WechatMiniprogram.Page.Instance<D, C> & { [index: string]: any };
 
       type WXOption<D extends DataOption, C extends CustomOption> = Partial<PToolSpace.PageOption> &
         ThisType<WXInstance<D, C>> &

@@ -14,7 +14,7 @@ import { isObject, isString } from "@/utils/is";
 import bridge from "./bridge";
 import config from "./config";
 import Emit from "./emit";
-
+type routeMethod = "navigateTo" | "redirectTo" | "switchTab" | "reLaunch" | "navigateBack";
 class Router extends Emit {
   beforeRoute: Function[];
   afterRoute: Function[];
@@ -43,7 +43,11 @@ class Router extends Emit {
   navigateBack(cfg: NavigateToOption) {
     return this.route("navigateBack", cfg, [].slice.call(arguments));
   }
-  route(type: string, cfg: NavigateToOption, args: any[]) {
+  route(type: routeMethod, cfg: NavigateToOption, args: any[]) {
+    if (type === "navigateBack") {
+      this.emit(type, cfg.url, cfg.params);
+      return wx[type].apply(wx, args);
+    }
     if (cfg.name) {
       cfg.url = bridge.getPageUrlByName(cfg.name);
     }
