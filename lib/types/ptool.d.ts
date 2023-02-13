@@ -1,4 +1,3 @@
-/// <reference path="../../node_modules/miniprogram-api-typings/index.d.ts" />
 declare global {
   namespace PToolSpace {
     // 页面接受参数
@@ -7,11 +6,11 @@ declare global {
       params: Record<string, any>;
     }
     /** 页面注册选项 */
-    interface PageOption {
+    interface PageOption<G extends MapGetterData> {
       // 页面名称
       name?: string;
       // 如果有启用store状态管理的话，mapGetters可以映射store中的getters
-      mapGetters?: Record<string, string>;
+      mapGetters?: G;
       /**
        * 小程序在切入后台后被唤醒
        * @param time 休眠时间(单位ms)
@@ -42,9 +41,9 @@ declare global {
        */
       onNavigate(options: PageNavigateOption): void;
     }
-    interface ComponentOption {
+    interface ComponentOption<G extends MapGetterData> {
       // 如果有启用store状态管理的话，mapGetters可以映射store中的getters
-      mapGetters?: Record<string, string>;
+      mapGetters?: G;
     }
     interface AppOption {
       /** 小程序路径解析配置 */
@@ -157,59 +156,62 @@ declare global {
     }
 
     type navigate = (c: NavigateToOption) => void;
+    type MapGetterData = Record<string, string>;
     /** 页面实例 */
-    interface PageInstance extends Router {
-      /** 当前页面名称 */
-      $name: string;
+    type PageInstance<G extends MapGetterData> = Router &
+      G & {
+        /** 当前页面名称 */
+        $name: string;
 
-      /** 一些由PTool生成的页面状态 */
-      $state: {
-        // 页面激活状态
-        lifeState: PageState;
+        /** 一些由PTool生成的页面状态 */
+        $state: {
+          // 页面激活状态
+          lifeState: PageState;
+        };
+        /** 指定了 `ref` 的子组件实例Map */
+        $refs: any;
+        $store: StoreUse;
+        // 一次性存取
+        $put: (key: string, value: any) => void;
+        $take: (key: string) => any;
       };
-      /** 指定了 `ref` 的子组件实例Map */
-      $refs: any;
-      $store: StoreUse;
-      // 一次性存取
-      $put: (key: string, value: any) => void;
-      $take: (key: string) => any;
-    }
 
     /** 组件实例 */
-    interface ComponentInstance<D extends WechatMiniprogram.Component.DataOption> extends Router {
-      /** 当前组件所属的页面组件实例 只在 `attached`, `ready`生命周期后生效 */
-      $root: any;
-      $store: StoreUse;
+    type ComponentInstance<G extends MapGetterData> = Router &
+      G & {
+        /** 当前组件所属的页面组件实例 只在 `attached`, `ready`生命周期后生效 */
+        $root: any;
+        $store: StoreUse;
 
-      /** 一些由PTool生成的组件状态 */
-      $state: {
-        // 页面激活状态
-        lifeState: ComponentState;
+        /** 一些由PTool生成的组件状态 */
+        $state: {
+          // 页面激活状态
+          lifeState: ComponentState;
+        };
+        /**
+         * 当前组件所属的父组件实例引用 只在 `attached`, `ready`生命周期后生效
+         * 在非连续调用组件的情况下`$root`相同
+         */
+        $parent: any;
+        /**
+         * 指定了 ref 的子组件实例Map，在父组件获取子组件引用
+         *
+         * 示例：
+         *
+         * ```html
+         * <custom-component binding="$" ref="customComp"/>
+         * ```
+         *
+         * ```js
+         * Page.P({
+         *   onLoad: function () {
+         *     this.$refs.customComp // 根据ref属性获取子组件的实例引用
+         *   }
+         * });
+         * ```
+         */
+        $ref: any;
       };
-      /**
-       * 当前组件所属的父组件实例引用 只在 `attached`, `ready`生命周期后生效
-       * 在非连续调用组件的情况下`$root`相同
-       */
-      $parent: any;
-      /**
-       * 指定了 ref 的子组件实例Map，在父组件获取子组件引用
-       *
-       * 示例：
-       *
-       * ```html
-       * <custom-component binding="$" ref="customComp"/>
-       * ```
-       *
-       * ```js
-       * Page.P({
-       *   onLoad: function () {
-       *     this.$refs.customComp // 根据ref属性获取子组件的实例引用
-       *   }
-       * });
-       * ```
-       */
-      $ref: any;
-    }
     interface AppInstance {
       $store: StoreUse;
     }
@@ -334,19 +336,21 @@ declare global {
     namespace Page {
       type DataOption = WechatMiniprogram.Page.DataOption;
       type CustomOption = WechatMiniprogram.Page.CustomOption;
-      type Options<D, C> = WechatMiniprogram.Page.Options<D, C>;
-      type WXInstance<D extends DataOption, C extends CustomOption> = PToolSpace.PageInstance &
-        WechatMiniprogram.Page.Instance<D, C> & { [index: string]: any };
+      type Options<D extends DataOption, C extends CustomOption, G extends MapGetterData> = Partial<PToolSpace.PageOption<G>> &
+        WechatMiniprogram.Page.Options<D, C>;
+      type WXInstance<D extends DataOption, C extends CustomOption, G extends MapGetterData> = PToolSpace.PageInstance<G> &
+        WechatMiniprogram.Page.Instance<D & G, C> & { [index: string]: any };
 
-      type WXOption<D extends DataOption, C extends CustomOption> = Partial<PToolSpace.PageOption> &
-        ThisType<WXInstance<D, C>> &
-        Options<D, C> & { [index: string]: any };
+      type WXOption<D extends DataOption, C extends CustomOption, G extends MapGetterData> = ThisType<WXInstance<D, C, G>> &
+        Options<D, C, G>;
 
       interface WXConstructor {
-        <D extends DataOption, C extends CustomOption>(name: string, options: WXOption<D, C>): void;
+        <D extends DataOption, C extends CustomOption, G extends MapGetterData>(name: string, options: WXOption<D, C, G>): void;
       }
       interface WXConstructor {
-        <D extends DataOption, C extends CustomOption>(options: WXOption<D, C> & { name?: string }): void;
+        <D extends DataOption, C extends CustomOption, G extends MapGetterData>(
+          options: WXOption<D, C, G> & { name?: string },
+        ): void;
       }
     }
 
@@ -354,24 +358,34 @@ declare global {
       type DataOption = WechatMiniprogram.Component.DataOption;
       type PropertyOption = WechatMiniprogram.Component.PropertyOption;
       type MethodOption = WechatMiniprogram.Component.MethodOption;
-      type Instance<D, P extends PropertyOption, M extends Partial<MethodOption>> = WechatMiniprogram.Component.Instance<D, P, M>;
-      type Options<D, P extends PropertyOption, M extends Record<string, Function>> = WechatMiniprogram.Component.Options<
-        D,
-        P,
-        M
-      >;
-      type WXInstance<D extends DataOption, P extends PropertyOption, M extends MethodOption> = PToolSpace.ComponentInstance<D> &
-        Instance<D, P, M> & { [index: string]: any };
-
-      type WXOption<
+      type Instance<
+        D extends DataOption,
+        P extends PropertyOption,
+        M extends Partial<MethodOption>,
+        G extends MapGetterData,
+      > = WechatMiniprogram.Component.Instance<D, P, M, G>;
+      type Options<
+        D extends DataOption,
+        P extends PropertyOption,
+        M extends Record<string, Function>,
+        G extends MapGetterData,
+      > = WechatMiniprogram.Component.Options<D, P, M, G>;
+      type WXInstance<
         D extends DataOption,
         P extends PropertyOption,
         M extends MethodOption,
-      > = Partial<PToolSpace.ComponentOption> & ThisType<WXInstance<D, P, M>> & Options<D, P, M> & { [index: string]: any };
+        G extends MapGetterData,
+      > = PToolSpace.ComponentInstance<D> & Instance<D, P, M, G> & { [index: string]: any };
+
+      type WXOption<D extends DataOption, P extends PropertyOption, M extends MethodOption, G extends MapGetterData> = Partial<
+        PToolSpace.ComponentOption<G>
+      > &
+        ThisType<WXInstance<D, P, M, G>> &
+        Options<D, P, M, G>;
 
       interface WXConstructor {
-        <D extends DataOption = any, P extends PropertyOption = any, M extends MethodOption = any>(
-          options: WXOption<D, P, M>,
+        <D extends DataOption = any, P extends PropertyOption = any, M extends MethodOption = any, G extends MapGetterData = any>(
+          options: WXOption<D, P, M, G>,
         ): string;
       }
     }
