@@ -31,8 +31,8 @@ PTool.Page({
   gotoTest1() {
     console.log("route");
     console.log(new Date().getTime());
-    this.$route("test1?age=1",{
-      params:{name:1}
+    this.$route("test1?age=1", {
+      params: { name: 1 },
     });
   },
   getUserProfile(e: any) {

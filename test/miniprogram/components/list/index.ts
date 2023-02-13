@@ -2,7 +2,7 @@
 PTool.Component({
   properties: {},
   mapGetters: {
-    name: "test/name",
+    testName: "test/name",
   },
   /**
    * 组件的初始数据

@@ -1,5 +1,4 @@
 /// <reference path="../node_modules/miniprogram-api-typings/index.d.ts" />
-
 declare global {
   namespace PToolSpace {
     // 页面接受参数
@@ -31,10 +30,7 @@ declare global {
        * 需要在调用页面中使用`this.preload(pageName或pageShortName)`
        */
       onPreloaded(...a: any[]): void;
-      /**
-       * 子页面在wx.navigateBack时触发主页面onBack周期函数
-       */
-      onBack(options: Record<string, any>): void;
+
       /**
        * 页面即将被导航时触发
        *
@@ -50,23 +46,6 @@ declare global {
       // 如果有启用store状态管理的话，mapGetters可以映射store中的getters
       mapGetters?: Record<string, string>;
     }
-    interface PageModule {
-      option: Page.Options<Page.DataOption, Page.CustomOption> & PageInstance;
-      fns: Fns;
-      state: ToolState;
-      dispatcher: Dispatcher;
-    }
-    interface Dispatcher {
-      put: (key: string, value: any) => void;
-      take: <T = any>(key: string) => T;
-    }
-    interface Fns {
-      hasOwn: (obj: object, prop: string) => boolean;
-      wrapFun: (pre: any, wrapper: any) => any;
-      extend: (obj: object, ...args: any[]) => void;
-      objEach: <T extends object>(obj: T, fn: (key: keyof T, value: T[keyof T]) => void) => void;
-    }
-    type PageExtend = (module: PageModule) => void;
     interface AppOption {
       /** 小程序路径解析配置 */
       config: {
@@ -79,16 +58,6 @@ declare global {
          * @returns 实际页面的地址
          */
         resolvePath?(name: string): string;
-        /**
-         * 注意：使用此配置需要对框架有一定理解，使用时可以看看源码实现
-         * 可以自己再工具的基础上拓展内容
-         * 在工具初始化Page之前扩展
-         */
-        beforePageInitExtend?: PageExtend;
-        /**
-         * 在工具初始化Page之后扩展
-         */
-        afterPageInitExtend?: PageExtend;
       };
 
       /**
@@ -177,7 +146,7 @@ declare global {
        * this.$preload('/page/main?userName=xxx&action=xxx',{age:12});
        * ```
        */
-      $preload(pagename: string, params?: any): void;
+      $preload(pagename: string, params: any): void;
     }
     interface ToolState {
       refs: Record<string, typeof Component>;
@@ -204,8 +173,6 @@ declare global {
       // 一次性存取
       $put: (key: string, value: any) => void;
       $take: (key: string) => any;
-      // 返回页面存活状态
-      $isPageAlive: () => boolean;
     }
 
     /** 组件实例 */
@@ -234,7 +201,7 @@ declare global {
        * ```
        *
        * ```js
-       * PTool.Page({
+       * Page.P({
        *   onLoad: function () {
        *     this.$refs.customComp // 根据ref属性获取子组件的实例引用
        *   }

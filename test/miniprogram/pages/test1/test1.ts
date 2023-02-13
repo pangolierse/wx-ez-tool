@@ -1,13 +1,15 @@
-
 // pages/test1/test1.ts
-PTool.Page("test1", {
+PTool.Page({
+  name: "test1",
   /**
    * 页面的初始数据
    */
   mapGetters: {
-    name: "test/name",
+    testName: "test/name",
   },
-  data: {},
+  data: {
+    testName2: "123",
+  },
   onPreload(option) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -23,7 +25,7 @@ PTool.Page("test1", {
     this.$store.dispatch("test/changeName", 123123);
   },
   onLoad(option) {
-    console.log(option)
+    console.log(option);
     // setTimeout(() => {
     //   this.$back({
     //     params: {
