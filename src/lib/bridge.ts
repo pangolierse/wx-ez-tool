@@ -3,6 +3,7 @@ import { dispatcher } from "./state";
 import router from "./router";
 import { NavigateToOption } from "@/types/type";
 import { decryptParams, encryptionParams, parseUrlParams } from "@/utils";
+import { isFalse } from "@/utils/is";
 const navigate = route({ type: "navigateTo" });
 const redirect = route({ type: "redirectTo" });
 const switchTab = route({ type: "switchTab" });
@@ -78,7 +79,7 @@ function route({ type }) {
     const query = Object.entries(params)
       .map((item) => item.join("="))
       .join("&");
-    option.url = `${pagepath}${option.params ? "?encodeData=" + encryptionParams(option.params) : ""}${query ? "&" + query : ""}`;
+    option.url = `${pagepath}${!isFalse(option) ? "?encodeData=" + encryptionParams(option) : ""}${query ? "&" + query : ""}`;
     router[type](option);
   };
 }
