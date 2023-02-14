@@ -72,14 +72,16 @@ function route({ type }) {
     const pagepath = getPageUrlByName(url);
     const params = parseUrlParams(url);
     if (params.encodeData) {
-      option = Object.assign(decryptParams(params.encodeData), option);
+      option.params = Object.assign(decryptParams(params.encodeData), option.params);
       delete params.encodeData;
     }
     // append querystring
     const query = Object.entries(params)
       .map((item) => item.join("="))
       .join("&");
-    option.url = `${pagepath}${!isFalse(option) ? "?encodeData=" + encryptionParams(option) : ""}${query ? "&" + query : ""}`;
+    option.url = `${pagepath}${!isFalse(option) ? "?encodeData=" + encryptionParams(option.params) : ""}${
+      query ? "&" + query : ""
+    }`;
     router[type](option);
   };
 }
