@@ -1,7 +1,7 @@
 /**
  * 对wx.navigateTo、wx.redirectTo、wx.navigateBack的包装，在它们的基础上添加了事件
  */
-import { NavigateToOption, NavigationGuard, NavigationGuardNext, Route } from "@/types/type";
+import { BackToOption, NavigateToOption, NavigationGuard, NavigationGuardNext, Route } from "@/types/type";
 import { registerHook } from "@/utils/index";
 import {
   createNavigationCancelledError,
@@ -40,14 +40,11 @@ class Router extends Emit {
   reLaunch(cfg: NavigateToOption) {
     return this.route("reLaunch", cfg, [].slice.call(arguments));
   }
-  navigateBack(cfg: any = {}) {
-    return this.route("navigateBack", cfg, [].slice.call(arguments));
+  navigateBack(cfg: BackToOption) {
+    this.emit("navigateBack", "", cfg.params);
+    return wx["navigateBack"].apply(wx, [].slice.call(arguments));
   }
   route(type: routeMethod, cfg: NavigateToOption, args: any[]) {
-    if (type === "navigateBack") {
-      this.emit(type, "", cfg.params);
-      return wx[type].apply(wx, args);
-    }
     if (cfg.name) {
       cfg.url = bridge.getPageUrlByName(cfg.name);
     }
@@ -114,7 +111,7 @@ class Router extends Emit {
     return registerHook(this.beforeRoute, fn);
   }
   afterEach(fn: NavigationGuard) {
-    return registerHook(this.beforeRoute, fn);
+    return registerHook(this.afterRoute, fn);
   }
   onError(fn) {
     this.errorCbs.push(fn);

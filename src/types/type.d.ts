@@ -15,6 +15,13 @@ interface Emit {
 }
 interface ErrCallBack extends WechatMiniprogram.GeneralCallbackResult {}
 
+interface BackToOption extends WechatMiniprogram.NavigateBackOption {
+  name?: string;
+  // 页面参数
+  params?: any;
+  fail?: (res: ErrCallBack) => void;
+}
+
 interface NavigateToOption extends WechatMiniprogram.NavigateToOption {
   name?: string;
   // 页面参数

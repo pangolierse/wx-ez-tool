@@ -1,14 +1,14 @@
 import config from "./config";
 import { dispatcher } from "./state";
 import router from "./router";
-import { NavigateToOption } from "@/types/type";
+import { BackToOption } from "@/types/type";
 import { decryptParams, encryptionParams, parseUrlParams } from "@/utils";
 import { isFalse } from "@/utils/is";
 const navigate = route({ type: "navigateTo" });
 const redirect = route({ type: "redirectTo" });
 const switchTab = route({ type: "switchTab" });
 const reLaunch = route({ type: "reLaunch" });
-const navigateBack = (option: NavigateToOption) => {
+const navigateBack = (option: BackToOption) => {
   router.navigateBack(option);
 };
 export default {
