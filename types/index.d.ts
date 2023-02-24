@@ -40,6 +40,9 @@ declare global {
        * 或者是通过微信小程序二维码或微信内分享直接跳转到小程序子页面时同样不会触发
        */
       onNavigate(options: PageNavigateOption): void;
+
+      // 次级页面触发this.$back时触发
+      onBack(params: Record<string, any>): void;
     }
     interface ComponentOption<G extends MapGetterData> {
       // 如果有启用store状态管理的话，mapGetters可以映射store中的getters

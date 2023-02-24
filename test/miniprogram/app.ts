@@ -1,4 +1,3 @@
-import "./lib/ptool.esm";
 import store from "./store/index";
 // import { PTool } from "./typings/ptool";
 // PTool.App({
