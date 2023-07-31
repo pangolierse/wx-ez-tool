@@ -1,3 +1,4 @@
 <!--pages/test1/test1.wxml-->
 <button bindtap="changeName">changeName</button>
+{{abc}}
 <text>pages/test1/test1.wxml</text>

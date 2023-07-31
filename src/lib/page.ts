@@ -10,7 +10,7 @@ import { decryptParams, toPromise } from "@/utils";
 import config from "./config";
 const defaultState = { lifeState: PageState.pendding, preloadFn: null };
 const namePool = {};
-type PageOption = PToolSpace.Page.Options<any, any> & PToolSpace.PageInstance;
+type PageOption = PToolSpace.Page.Options<any, any, any> & PToolSpace.PageInstance<any>;
 // 总事件管理
 function IPage(name, option?: PageOption) {
   if (isObject(name)) {
@@ -44,8 +44,8 @@ function IPage(name, option?: PageOption) {
     console.log(`Page[${name}] define "onNavigate"`);
     dispatcher.on(`navigateTo:${name}`, onNavigateHandler);
     dispatcher.on(`redirectTo:${name}`, onNavigateHandler);
-    dispatcher.on(`switchTabTo:${name}`, onNavigateHandler);
-    dispatcher.on(`reLaunchTo:${name}`, onNavigateHandler);
+    dispatcher.on(`switchTab:${name}`, onNavigateHandler);
+    dispatcher.on(`reLaunch:${name}`, onNavigateHandler);
   }
   if (option.onBack) {
     assert(name !== "_unknow", "用到onBack方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");

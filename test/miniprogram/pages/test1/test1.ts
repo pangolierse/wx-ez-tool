@@ -8,6 +8,7 @@ PTool.Page({
     testName: "test/name",
   },
   data: {
+    abc:"",
     testName2: "123",
   },
   onPreload(option) {
@@ -38,13 +39,27 @@ PTool.Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady() {},
-  onNavigate() {
-    console.log("test1: navigate");
+  onNavigate({params}) {
+    console.log("params",params)
+    console.log(this)
+    this.$put('defaultJumpOperate',{
+      tab:1
+    })
+  },
+
+  test(){
+    wx.nextTick(()=>{
+      this.setData({
+        abc:"123",
+      })
+    })
   },
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow() {},
+  onShow() {
+    console.log('take',this.$take("defaultJumpOperate"))
+  },
 
   /**
    * 生命周期函数--监听页面隐藏

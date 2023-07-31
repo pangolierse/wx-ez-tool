@@ -2,7 +2,8 @@
 // const util = require('../../utils/util.js')
 import { formatTime } from '../../utils/util'
 
-Page({
+PTool.Page({
+  name:"logs",
   data: {
     logs: [],
   },

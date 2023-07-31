@@ -1,8 +1,6 @@
 import store from "./store/index";
-// import { PTool } from "./typings/ptool";
 // PTool.App({
-
-// import "wx-ez-tool";
+import "wx-ez-tool"
 
 PTool.createStore(store);
 PTool.router.beforeEach((to, from, next) => {
@@ -11,20 +9,20 @@ PTool.router.beforeEach((to, from, next) => {
 PTool.router.beforeEach((to, from, next) => {
   next();
 });
-PTool.router.beforeEach((to, from, next) => {
-  if (to.name == "logs") {
-    next({ name: "test1" });
-    return;
-  }
-  next();
-});
+// PTool.router.beforeEach((to, from, next) => {
+//   if (to.name == "logs") {
+//     next({ name: "test1" });
+//     return;
+//   }
+//   next();
+// });
 PTool.App({
   config: {
     route: "/pages/$page/$page",
     beforePageInitExtend:({option,fns}) => {
-      option.onLoad = fns.wrapFun(option.onLoad,function(){
-        console.log("每个页面都要console：",this.route)
-      })
+      // option.onLoad = fns.wrapFun(option.onLoad,function(){
+      //   console.log("每个页面都要console：",this.route)
+      // })
     }
   },
   onLaunch() {

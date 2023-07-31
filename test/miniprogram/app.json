@@ -4,6 +4,19 @@
     "pages/logs/logs",
     "pages/test1/test1"
   ],
+  "tabBar": {
+    "list": [
+      {
+        "pagePath":"pages/index/index"
+      },
+      {
+        "pagePath":"pages/logs/logs"
+      },
+      {
+        "pagePath":"pages/test1/test1"
+      }
+    ]
+  },
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",

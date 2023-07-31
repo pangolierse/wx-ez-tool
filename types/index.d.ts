@@ -1,3 +1,8 @@
+// type AnyProper<G> = {
+
+// }
+// type Subordinate<T> = { [P in keyof T]: T[P] };
+
 declare global {
   namespace PToolSpace {
     // 页面接受参数
@@ -123,7 +128,7 @@ declare global {
        * @param config 传递给 `wx.switchTab` api的参数(url会自动由`pagename`解析的结果填充)
        *
        */
-      $switchTab(pagename: string, config?: WechatMiniprogram.SwitchTabOption): void;
+      $switch(pagename: string, config?: WechatMiniprogram.SwitchTabOption&{params?:any}): void;
       /**
        * 关闭所有页面，打开到应用内的某个页面
        * 本函数是`wx.reLaunch`的封装。跳转到指定页面。`pagename`可以带上`queryString`
@@ -159,7 +164,7 @@ declare global {
     }
 
     type navigate = (c: NavigateToOption) => void;
-    type MapGetterData = Record<string, string>;
+    type MapGetterData = Record<string, any>;
     /** 页面实例 */
     type PageInstance<G extends MapGetterData> = Router &
       G & {

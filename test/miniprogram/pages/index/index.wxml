@@ -2,24 +2,39 @@
 <view class="container">
   <view class="userinfo">
     <block wx:if="{{canIUseOpenData}}">
-      <view class="userinfo-avatar" bindtap="bindViewTap">
+      <view
+        class="userinfo-avatar"
+        bindtap="bindViewTap"
+      >
         <open-data type="userAvatarUrl"></open-data>
       </view>
       <open-data type="userNickName"></open-data>
     </block>
     <block wx:elif="{{!hasUserInfo}}">
-      <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-      <button wx:elif="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+      <button
+        wx:if="{{canIUseGetUserProfile}}"
+        bindtap="getUserProfile"
+      > 获取头像昵称 </button>
+      <button
+        wx:elif="{{canIUse}}"
+        open-type="getUserInfo"
+        bindgetuserinfo="getUserInfo"
+      > 获取头像昵称 </button>
       <view wx:else> 请使用1.4.4及以上版本基础库 </view>
     </block>
     <block wx:else>
-      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+      <image
+        bindtap="bindViewTap"
+        class="userinfo-avatar"
+        src="{{userInfo.avatarUrl}}"
+        mode="cover"
+      ></image>
       <text class="userinfo-nickname">{{userInfo.nickName}}</text>
     </block>
     <text>
       {{name}}
     </text>
-    <button bindtap="gotoTest1">gotoTest1</button>
+    <button bindtap="switchTest1">switchTest1</button>
     <list></list>
   </view>
   <view class="usermotto">

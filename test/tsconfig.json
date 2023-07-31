@@ -22,7 +22,7 @@
     ]
   },
   "include": [
-    "./**/*.ts"
+    "./**/*.ts", "lib/ptool.esm.js"
   ],
   "exclude": [
     "node_modules"

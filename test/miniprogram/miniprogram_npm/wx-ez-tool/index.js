@@ -1,3 +1,12 @@
+module.exports = (function() {
+var __MODS__ = {};
+var __DEFINE__ = function(modId, func, req) { var m = { exports: {}, _tempexports: {} }; __MODS__[modId] = { status: 0, func: func, req: req, m: m }; };
+var __REQUIRE__ = function(modId, source) { if(!__MODS__[modId]) return require(source); if(!__MODS__[modId].status) { var m = __MODS__[modId].m; m._exports = m._tempexports; var desp = Object.getOwnPropertyDescriptor(m, "exports"); if (desp && desp.configurable) Object.defineProperty(m, "exports", { set: function (val) { if(typeof val === "object" && val !== m._exports) { m._exports.__proto__ = val.__proto__; Object.keys(val).forEach(function (k) { m._exports[k] = val[k]; }); } m._tempexports = val }, get: function () { return m._tempexports; } }); __MODS__[modId].status = 1; __MODS__[modId].func(__MODS__[modId].req, m, m.exports); } return __MODS__[modId].m.exports; };
+var __REQUIRE_WILDCARD__ = function(obj) { if(obj && obj.__esModule) { return obj; } else { var newObj = {}; if(obj != null) { for(var k in obj) { if (Object.prototype.hasOwnProperty.call(obj, k)) newObj[k] = obj[k]; } } newObj.default = obj; return newObj; } };
+var __REQUIRE_DEFAULT__ = function(obj) { return obj && obj.__esModule ? obj.default : obj; };
+__DEFINE__(1689219210779, function(require, module, exports) {
+
+
 /* 参数是否为undefined */
 /* 参数是否为object */
 const isObject = (target) => {
@@ -108,11 +117,11 @@ function runQueue(queue, fn, cb) {
 
 var fns = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  hasOwn: hasOwn,
-  wrapFun: wrapFun,
   extend: extend,
+  hasOwn: hasOwn,
   objEach: objEach,
-  runQueue: runQueue
+  runQueue: runQueue,
+  wrapFun: wrapFun
 });
 
 var PageState;
@@ -843,7 +852,7 @@ class Router extends Emit {
         return this.route("reLaunch", cfg, [].slice.call(arguments));
     }
     navigateBack(cfg) {
-        this.emit("navigateBack", "", (cfg === null || cfg === void 0 ? void 0 : cfg.params) || {});
+        this.emit("navigateBack", "", cfg.params);
         return wx["navigateBack"].apply(wx, [].slice.call(arguments));
     }
     route(type, cfg, args) {
@@ -1064,7 +1073,8 @@ function IPage(name, option) {
     if (option.onNavigate) {
         assert(name !== "_unknow", "用到onNavigate方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
         let onNavigateHandler = function (url, params) {
-            option.onNavigate({ url, params });
+          console.log("isalive",option.$isPageAlive())
+          option.onNavigate({url,params})
         };
         console.log(`Page[${name}] define "onNavigate"`);
         dispatcher.on(`navigateTo:${name}`, onNavigateHandler);
@@ -1290,4 +1300,10 @@ Object.defineProperty(Object.prototype, "PTool", {
     enumerable: false,
 });
 
-export { PTool as default };
+module.exports = PTool;
+
+}, function(modId) {var map = {}; return __REQUIRE__(map[modId], modId); })
+return __REQUIRE__(1689219210779);
+})()
+//miniprogram-npm-outsideDeps=[]
+//# sourceMappingURL=index.js.map

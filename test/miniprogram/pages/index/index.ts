@@ -28,10 +28,8 @@ PTool.Page({
     });
     this.$preload("test1", { msg: "test1你该预加载了" });
   },
-  gotoTest1() {
-    console.log("route");
-    console.log(new Date().getTime());
-    this.$route("test1?age=1", {
+  switchTest1() {
+    this.$switch("test1?age=1", {
       params: { name: 1 },
     });
   },

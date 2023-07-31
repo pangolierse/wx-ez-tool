@@ -108,11 +108,11 @@ function runQueue(queue, fn, cb) {
 
 var fns = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  extend: extend,
   hasOwn: hasOwn,
+  wrapFun: wrapFun,
+  extend: extend,
   objEach: objEach,
-  runQueue: runQueue,
-  wrapFun: wrapFun
+  runQueue: runQueue
 });
 
 var PageState;
@@ -843,7 +843,7 @@ class Router extends Emit {
         return this.route("reLaunch", cfg, [].slice.call(arguments));
     }
     navigateBack(cfg) {
-        this.emit("navigateBack", "", cfg.params);
+        this.emit("navigateBack", "", (cfg === null || cfg === void 0 ? void 0 : cfg.params) || {});
         return wx["navigateBack"].apply(wx, [].slice.call(arguments));
     }
     route(type, cfg, args) {
@@ -1069,8 +1069,8 @@ function IPage(name, option) {
         console.log(`Page[${name}] define "onNavigate"`);
         dispatcher.on(`navigateTo:${name}`, onNavigateHandler);
         dispatcher.on(`redirectTo:${name}`, onNavigateHandler);
-        dispatcher.on(`switchTabTo:${name}`, onNavigateHandler);
-        dispatcher.on(`reLaunchTo:${name}`, onNavigateHandler);
+        dispatcher.on(`switchTab:${name}`, onNavigateHandler);
+        dispatcher.on(`reLaunch:${name}`, onNavigateHandler);
     }
     if (option.onBack) {
         assert(name !== "_unknow", "用到onBack方法必须要为页面添加name属性，name值需与APP中的路由规则相匹配");
